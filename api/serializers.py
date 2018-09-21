@@ -11,6 +11,10 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(required=False)
+    first_name = serializers.CharField(max_length=30, required=False)
+    last_name = serializers.CharField(max_length=150, required=False)
+
     class Meta:
         model = Profile
         fields = (
@@ -18,3 +22,4 @@ class ProfileSerializer(serializers.ModelSerializer):
             'first_name', 'last_name', 'patronymic',
             'gender', 'birth_date'
         )
+        depth = 1
