@@ -4,5 +4,6 @@ psycopg2-binary
 gunicorn
 django-heroku
 markdown
-coreapi
-coreschema
+drf-yasg
+flex
+swagger_spec_validator
