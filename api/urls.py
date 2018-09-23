@@ -8,7 +8,7 @@ router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 
 urlpatterns = [
+    url(r'^session/', views.SessionView.as_view()),
+    url(r'^users/me/', views.CurrentUserView.as_view()),
     url(r'^', include(router.urls)),
-    url(r'^auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^profile/', views.Profile.as_view()),
 ]

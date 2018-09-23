@@ -36,10 +36,11 @@ schema_view = get_schema_view(
 
 
 urlpatterns = [
+    url(r'^auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include('api.urls')),
     url(r'^docs/', schema_view.with_ui('swagger', cache_timeout=0)),
     url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-    url(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    url(r'^swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     url(r'^$', schema_view.with_ui('swagger', cache_timeout=0)),
 ]

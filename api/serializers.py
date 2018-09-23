@@ -1,25 +1,37 @@
-from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from api.models import Profile
+from api.models import User
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class CredentialsSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('url', 'username', 'email', 'groups')
+        fields = ('username', 'password')
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def create(self, validated_data):
+        return User.objects.create_user(validated_data.get('username'), password=validated_data.get('password'))
 
 
-class ProfileSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(required=False)
-    first_name = serializers.CharField(max_length=30, required=False)
-    last_name = serializers.CharField(max_length=150, required=False)
 
+
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Profile
+        model = User
         fields = (
-            'username', 'email', 'phone',
-            'first_name', 'last_name', 'patronymic',
+            'username', 'password',
+            'email', 'phone',
+            'last_name', 'first_name', 'patronymic',
             'gender', 'birth_date'
         )
-        depth = 1
+        read_only_fields = ('username',)
+        extra_kwargs = {
+            'password': {'write_only': True},
+            # 'email': {'required': False},
+            # 'phone': {'required': False},
+            # 'last_name': {'required': False},
+            # 'first_name': {'required': False},
+            # 'patronymic': {'required': False},
+            # 'gender': {'required': False},
+            # 'birth_date': {'required': False}
+        }
