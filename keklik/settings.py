@@ -139,6 +139,7 @@ CORS_ORIGIN_WHITELIST = (
     'localhost',
     'localhost:3000',
 )
+CORS_ALLOW_CREDENTIALS = True
 
 
 django_heroku.settings(locals())
