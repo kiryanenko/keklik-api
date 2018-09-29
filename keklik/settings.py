@@ -135,7 +135,7 @@ STATIC_URL = '/static/'
 
 # CORS_ORIGIN_ALLOW_ALL = True
 CORS_ORIGIN_WHITELIST = (
-    'keklik.herokuapp.com',
+    'https://keklik.herokuapp.com',
     'localhost',
     'localhost:3000',
 )
