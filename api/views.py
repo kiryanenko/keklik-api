@@ -62,6 +62,7 @@ class UserViewSet(mixins.CreateModelMixin, GenericViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         user = serializer.save()
+        login(request, user)
         return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
 
 
