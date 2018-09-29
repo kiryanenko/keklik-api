@@ -2,14 +2,14 @@ from django.conf.urls import url
 from django.urls import include
 from rest_framework import routers
 
-from api import views
+from api.views.user import UserViewSet, SessionView, CurrentUserView, PasswordView
 
 router = routers.DefaultRouter()
-router.register(r'users', views.UserViewSet)
+router.register(r'users', UserViewSet)
 
 urlpatterns = [
-    url(r'^session/$', views.SessionView.as_view()),
-    url(r'^users/me/$', views.CurrentUserView.as_view()),
-    url(r'^users/me/password/$', views.PasswordView.as_view()),
+    url(r'^session/$', SessionView.as_view()),
+    url(r'^users/me/$', CurrentUserView.as_view()),
+    url(r'^users/me/password/$', PasswordView.as_view()),
     url(r'^', include(router.urls)),
 ]

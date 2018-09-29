@@ -27,7 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
-    'keklik-api.herokuapp.com'
+    'keklik-api.herokuapp.com',
+    'keklik.herokuapp.com'
 ]
 
 # Application definition
