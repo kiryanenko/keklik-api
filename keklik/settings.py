@@ -134,13 +134,19 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
 
-# CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = (
     'keklik.herokuapp.com',
     'localhost',
     'localhost:3000',
 )
 CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = (
+    'keklik.herokuapp.com',
+    'localhost',
+    'localhost:3000',
+)
 
 
 django_heroku.settings(locals())
