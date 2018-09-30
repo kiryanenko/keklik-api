@@ -79,7 +79,7 @@ class CurrentUserView(GenericAPIView):
             status.HTTP_403_FORBIDDEN: status_text(status.HTTP_403_FORBIDDEN)
         }
     )
-    def post(self, request):
+    def get(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
 
