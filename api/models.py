@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from rest_framework.authtoken.models import Token
 
 
 class User(AbstractUser):
@@ -15,6 +16,11 @@ class User(AbstractUser):
 
     birth_date = models.DateField(null=True)
     rating = models.IntegerField(default=0)
+
+    @property
+    def token(self):
+        token, created = Token.objects.get_or_create(user=self)
+        return token.key
 
 
 class Quiz(models.Model):

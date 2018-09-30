@@ -3,7 +3,8 @@ from http.client import responses
 from django.contrib.auth import login, logout
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, permissions, mixins
-from rest_framework.compat import authenticate
+from rest_framework.authtoken.serializers import AuthTokenSerializer
+from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
@@ -16,24 +17,22 @@ def status_text(status_code):
     return responses.get(status_code, '')
 
 
-class SessionView(GenericAPIView):
-    serializer_class = CredentialsSerializer
-
+class SessionView(ObtainAuthToken):
     @swagger_auto_schema(
         operation_summary='Sign In',
+        request_body=AuthTokenSerializer,
         responses={
-            status.HTTP_200_OK: UserSerializer,
+            status.HTTP_200_OK: CredentialsSerializer,
             status.HTTP_400_BAD_REQUEST: 'Incorrect username or password.',
         }
     )
-    def post(self, request):
-        user = authenticate(request, username=request.data.get('username'), password=request.data.get('password'))
-
-        if not user:
-            return Response('Incorrect username or password.', status=status.HTTP_400_BAD_REQUEST)
-
+    def post(self, request, **kwargs):
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
         login(request, user)
-        return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
+        return Response(CredentialsSerializer(user).data)
 
     @swagger_auto_schema(
         operation_summary='Sign Out',
@@ -49,9 +48,9 @@ class UserViewSet(mixins.CreateModelMixin, GenericViewSet):
 
     @swagger_auto_schema(
         operation_summary='Sign Up',
-        request_body=CredentialsSerializer,
+        request_body=AuthTokenSerializer,
         responses={
-            status.HTTP_201_CREATED: UserSerializer,
+            status.HTTP_201_CREATED: CredentialsSerializer,
             status.HTTP_400_BAD_REQUEST: 'A user with that username already exists.',
         }
     )
@@ -63,7 +62,7 @@ class UserViewSet(mixins.CreateModelMixin, GenericViewSet):
 
         user = serializer.save()
         login(request, user)
-        return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
+        return Response(CredentialsSerializer(user).data, status=status.HTTP_201_CREATED)
 
 
 class CurrentUserView(GenericAPIView):

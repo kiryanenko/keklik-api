@@ -8,8 +8,24 @@ from api.models import User
 class CredentialsSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('username', 'password')
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = (
+            'username', 'password', 'token',
+            'email', 'phone',
+            'last_name', 'first_name', 'patronymic',
+            'gender', 'birth_date'
+        )
+        read_only_fields = (
+            'token',
+            'email', 'phone',
+            'last_name', 'first_name', 'patronymic',
+            'gender', 'birth_date'
+        )
+        extra_kwargs = {
+            'password': {'write_only': True},
+            'token': {'help_text': 'Токен аутентификации, '
+                                   'который необходимо добавлять в заголовок '
+                                   '"Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b"'}
+        }
 
     def create(self, validated_data):
         return User.objects.create_user(validated_data.get('username'), password=validated_data.get('password'))
