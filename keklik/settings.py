@@ -144,6 +144,7 @@ STATIC_URL = '/static/'
 
 CORS_ORIGIN_WHITELIST = (
     'keklik.herokuapp.com',
+    'keklik-dev.herokuapp.com',
     'localhost',
     'localhost:3000',
 )
@@ -152,6 +153,7 @@ CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = (
     'keklik-api.herokuapp.com',
     'keklik.herokuapp.com',
+    'keklik-dev.herokuapp.com',
     'localhost',
     'localhost:3000',
 )
