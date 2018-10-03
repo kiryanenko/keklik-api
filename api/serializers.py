@@ -2,7 +2,7 @@ from django.contrib.auth import password_validation
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from api.models import User
+from api.models import User, Quiz, Tag, Question, Variant
 
 
 class CredentialsSerializer(serializers.ModelSerializer):
@@ -41,9 +41,10 @@ class UserSerializer(serializers.ModelSerializer):
         fields = (
             'username', 'email', 'phone',
             'last_name', 'first_name', 'patronymic',
-            'gender', 'birth_date'
+            'gender', 'birth_date',
+            'rating'
         )
-        read_only_fields = ('username',)
+        read_only_fields = ('username', 'rating')
 
 
 class ChangePasswordSerializer(serializers.Serializer):
@@ -63,3 +64,41 @@ class ChangePasswordSerializer(serializers.Serializer):
         if not self.instance.check_password(value):
             raise ValidationError('Incorrect old password')
         return value
+
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ('tag',)
+
+
+class VariantSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Variant
+        fields = ('variant',)
+
+
+class QuestionSerializer(serializers.ModelSerializer):
+    variants = VariantSerializer(many=True)
+
+    class Meta:
+        model = Question
+        fields = ('id', 'number', 'type', 'question', 'variants', 'answer', 'time', 'points')
+
+
+class QuizSerializer(serializers.ModelSerializer):
+    tags = TagSerializer(many=True)
+    user = UserSerializer(read_only=True)
+    questions = QuestionSerializer(many=True)
+
+    class Meta:
+        model = Quiz
+        fields = (
+            'id', 'title', 'description',
+            'user',
+            'tags',
+            'questions',
+            'rating',
+            'version_date'
+        )
+        read_only_fields = ('user', 'rating')
