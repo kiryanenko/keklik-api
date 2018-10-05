@@ -22,8 +22,7 @@ class CredentialsSerializer(serializers.ModelSerializer):
         )
         extra_kwargs = {
             'password': {'write_only': True},
-            'token': {'help_text': 'Токен аутентификации, '
-                                   'который необходимо добавлять в заголовок '
+            'token': {'help_text': 'Токен аутентификации, который необходимо добавлять в заголовок\n'
                                    '"Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b"'}
         }
 
@@ -71,11 +70,14 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
         fields = ('tag',)
 
+    def create(self, validated_data):
+        return Tag.objects.get_or_create(tag=validated_data.get('tag'))
+
 
 class VariantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Variant
-        fields = ('variant',)
+        fields = ('id', 'variant',)
 
 
 class QuestionSerializer(serializers.ModelSerializer):

@@ -35,7 +35,7 @@ class Quiz(models.Model):
 
 class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
-    number = models.IntegerField(db_index=True)
+    number = models.IntegerField(db_index=True, help_text='Номер вопроса, начиная с 1.')
 
     TYPE_CHOICES = (
         ('single', 'Single'),
@@ -44,12 +44,14 @@ class Question(models.Model):
     )
     type = models.CharField(max_length=10, choices=TYPE_CHOICES)
 
-    question = models.TextField()
+    question = models.TextField(help_text='Текст вопроса.')
     answer = ArrayField(
-        models.IntegerField()
+        models.IntegerField(), help_text='ID правильных вариантов ответов.\n'
+                                         'Для Single вопросов массив состоит из одного элемента.\n'
+                                         'Для Sequence важен порядок.'
     )
-    time = models.TimeField(null=True)
-    points = models.IntegerField()
+    time = models.TimeField(null=True, help_text='Таймер. Null означает, что таймера нет.')
+    points = models.IntegerField(help_text='Очки за правильный ответ')
 
     class Meta:
         unique_together = ('number', 'question')
