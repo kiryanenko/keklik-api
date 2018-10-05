@@ -77,6 +77,7 @@ class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = ('id', 'number', 'type', 'question', 'variants', 'answer', 'time', 'points')
+        read_only_fields = ('number',)
 
 
 class QuizSerializer(serializers.ModelSerializer):
@@ -97,18 +98,4 @@ class QuizSerializer(serializers.ModelSerializer):
         read_only_fields = ('user', 'rating', 'version_date')
 
     def create(self, validated_data):
-        tags = validated_data.pop('tags', [])
-        questions = validated_data.pop('questions', [])
-        quiz = Quiz.objects.create(**validated_data)
-
-        for tag_data in tags:
-            tag = Tag.objects.get_or_create(tag=tag_data)
-            quiz.tags.add(tag)
-
-        for question_data in questions:
-            variants = question_data.pop('variants', [])
-            question = Question.objects.create(quiz=quiz, **question_data)
-            for variant_data in variants:
-                Variant.objects.create(question=question, **variant_data)
-
-        return quiz
+        return Quiz.objects.create_quiz(**validated_data)

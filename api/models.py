@@ -23,6 +23,29 @@ class User(AbstractUser):
         return token.key
 
 
+class QuizManager(models.Manager):
+    def create_quiz(self, questions=None, tags=None, **kwargs):
+        if questions is None:
+            questions = []
+        if tags is None:
+            tags = []
+        quiz = self.create(**kwargs)
+
+        for tag_data in tags:
+            tag = Tag.objects.get_or_create(tag=tag_data)
+            quiz.tags.add(tag)
+
+        number = 1
+        for question_data in questions:
+            variants = question_data.pop('variants', [])
+            question = Question.objects.create(number=number, quiz=quiz, **question_data)
+            for variant_data in variants:
+                Variant.objects.create(question=question, **variant_data)
+            number += 1
+
+        return quiz
+
+
 class Quiz(models.Model):
     title = models.CharField(max_length=300, db_index=True)
     description = models.TextField(blank=True)
@@ -32,15 +55,18 @@ class Quiz(models.Model):
     version_date = models.DateTimeField(auto_now_add=True)
     old_version = models.ForeignKey('Quiz', on_delete=models.CASCADE, null=True)
 
+    objects = QuizManager()
+
 
 class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')
-    number = models.IntegerField(db_index=True, help_text='Номер вопроса, начиная с 1.')
+    number = models.IntegerField(db_index=True, help_text='Номер вопроса, начиная с 1.\n'
+                                                          'Соответствует порядковому номеру в массиве.')
 
     TYPE_CHOICES = (
-        ('single', 'Single'),
-        ('multi', 'Multi'),
-        ('sequence', 'Sequence'),
+        ('single', 'Single - один верный ответ'),
+        ('multi', 'Multi - несколько верных ответов'),
+        ('sequence', 'Sequence - правильная последовательность'),
     )
     type = models.CharField(max_length=10, choices=TYPE_CHOICES, help_text='Single - один верный ответ;\n'
                                                                            'Multi - несколько верных ответов;\n'
@@ -56,7 +82,8 @@ class Question(models.Model):
     points = models.IntegerField(help_text='Очки за правильный ответ')
 
     class Meta:
-        unique_together = ('quiz', 'number', 'question')
+        unique_together = ('quiz', 'number')
+        ordering = ('quiz', 'number')
 
 
 class Variant(models.Model):
