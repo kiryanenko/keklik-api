@@ -65,15 +65,6 @@ class ChangePasswordSerializer(serializers.Serializer):
         return value
 
 
-class TagSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Tag
-        fields = ('tag',)
-
-    def create(self, validated_data):
-        return Tag.objects.get_or_create(tag=validated_data.get('tag'))
-
-
 class VariantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Variant
@@ -89,7 +80,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 
 class QuizSerializer(serializers.ModelSerializer):
-    tags = TagSerializer(many=True)
+    tags = serializers.SlugRelatedField(many=True, read_only=True,  slug_field='tag')
     user = UserSerializer(read_only=True)
     questions = QuestionSerializer(many=True)
 
@@ -103,4 +94,21 @@ class QuizSerializer(serializers.ModelSerializer):
             'rating',
             'version_date'
         )
-        read_only_fields = ('user', 'rating')
+        read_only_fields = ('user', 'rating', 'version_date')
+
+    def create(self, validated_data):
+        tags = validated_data.pop('tags', [])
+        questions = validated_data.pop('questions', [])
+        quiz = Quiz.objects.create(**validated_data)
+
+        for tag_data in tags:
+            tag = Tag.objects.get_or_create(tag=tag_data)
+            quiz.tags.add(tag)
+
+        for question_data in questions:
+            variants = question_data.pop('variants', [])
+            question = Question.objects.create(quiz=quiz, **question_data)
+            for variant_data in variants:
+                Variant.objects.create(question=question, **variant_data)
+
+        return quiz

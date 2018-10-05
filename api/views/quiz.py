@@ -8,6 +8,7 @@ from api.serializers import QuizSerializer
 class QuizViewSet(ModelViewSet):
     queryset = Quiz.objects.all()
     serializer_class = QuizSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
-
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

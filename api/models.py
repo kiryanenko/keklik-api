@@ -29,12 +29,12 @@ class Quiz(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     tags = models.ManyToManyField('Tag')
     rating = models.IntegerField(default=0, db_index=True)
-    version_date = models.DateTimeField(auto_created=True)
+    version_date = models.DateTimeField(auto_now_add=True)
     old_version = models.ForeignKey('Quiz', on_delete=models.CASCADE, null=True)
 
 
 class Question(models.Model):
-    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')
     number = models.IntegerField(db_index=True, help_text='Номер вопроса, начиная с 1.')
 
     TYPE_CHOICES = (
@@ -54,11 +54,11 @@ class Question(models.Model):
     points = models.IntegerField(help_text='Очки за правильный ответ')
 
     class Meta:
-        unique_together = ('number', 'question')
+        unique_together = ('quiz', 'number', 'question')
 
 
 class Variant(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='variants')
     variant = models.CharField(max_length=300)
 
     class Meta:
