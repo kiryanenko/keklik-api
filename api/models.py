@@ -42,7 +42,9 @@ class Question(models.Model):
         ('multi', 'Multi'),
         ('sequence', 'Sequence'),
     )
-    type = models.CharField(max_length=10, choices=TYPE_CHOICES)
+    type = models.CharField(max_length=10, choices=TYPE_CHOICES, help_text='Single - один верный ответ;\n'
+                                                                           'Multi - несколько верных ответов;\n'
+                                                                           'Sequence - правильная последовательность.')
 
     question = models.TextField(help_text='Текст вопроса.')
     answer = ArrayField(
