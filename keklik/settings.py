@@ -84,11 +84,9 @@ WSGI_APPLICATION = 'keklik.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'keklik',
-        'USER': 'keklik',
-        'PASSWORD': '123456',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'NAME': os.environ('DATABASE_NAME', 'keklik'),
+        'USER': os.environ('DATABASE_USER', 'keklik'),
+        'PASSWORD': os.environ('DATABASE_PASSWORD', '123456')
     }
 }
 
