@@ -20,10 +20,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ')g9&5bdo3v-f*3rfyr8168zx9pxqp-d$4+6azac%qk1&pu#o3g'
+SECRET_KEY = os.environ.get('KEKLIK_API_SECRET_KEY', ')g9&5bdo3v-f*3rfyr8168zx9pxqp-d$4+6azac%qk1&pu#o3g')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(os.environ.get('KEKLIK_API_DEBUG', True))
 
 ALLOWED_HOSTS = [
     '127.0.0.1',

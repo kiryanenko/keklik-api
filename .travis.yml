@@ -1,0 +1,17 @@
+language: python
+cache: pip
+python:
+  - 3.6
+install: pip install -r requirements.txt
+script:
+  # run test suite
+  - pytest
+after_success:
+  # start ssh agent and add private key
+  - eval "$(ssh-agent -s)"
+  - chmod 600 deploy_key
+  - ssh-add deploy_key
+  # configure remote repository
+  - git remote add deploy keklik@46.229.213.75:/home/keklik/keklik-api.git
+  # push master branch to production
+  - git push -f deploy master
