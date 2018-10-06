@@ -5,7 +5,7 @@ python:
 install: pip install -r requirements.txt
 script:
   # run test suite
-  - pytest
+  - ./manage.py test
 after_success:
   # start ssh agent and add private key
   - eval "$(ssh-agent -s)"
