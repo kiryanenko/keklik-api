@@ -1,8 +1,20 @@
 from django.contrib.auth import password_validation
+from django.core.exceptions import ObjectDoesNotExist
+from django.utils.encoding import smart_text
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from api.models import User, Quiz, Tag, Question, Variant
+from api.models import User, Quiz, Question, Variant, Tag
+
+
+class CreatableSlugRelatedField(serializers.SlugRelatedField):
+    def to_internal_value(self, data):
+        try:
+            return self.get_queryset().get_or_create(**{self.slug_field: data})[0]
+        except ObjectDoesNotExist:
+            self.fail('does_not_exist', slug_name=self.slug_field, value=smart_text(data))
+        except (TypeError, ValueError):
+            self.fail('invalid')
 
 
 class CredentialsSerializer(serializers.ModelSerializer):
@@ -76,12 +88,12 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Question
-        fields = ('id', 'number', 'type', 'question', 'variants', 'answer', 'time', 'points')
+        fields = ('id', 'number', 'type', 'question', 'variants', 'answer', 'timer', 'points')
         read_only_fields = ('number',)
 
 
 class QuizSerializer(serializers.ModelSerializer):
-    tags = serializers.SlugRelatedField(many=True, read_only=True,  slug_field='tag')
+    tags = CreatableSlugRelatedField(many=True, queryset=Tag.objects.all(), slug_field='tag')
     user = UserSerializer(read_only=True)
     questions = QuestionSerializer(many=True)
 
@@ -99,3 +111,6 @@ class QuizSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return Quiz.objects.create_quiz(**validated_data)
+
+    def update(self, instance, validated_data):
+        return instance.update(**validated_data)

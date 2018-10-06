@@ -25,24 +25,15 @@ class User(AbstractUser):
 
 class QuizManager(models.Manager):
     def create_quiz(self, questions=None, tags=None, **kwargs):
-        if questions is None:
-            questions = []
-        if tags is None:
-            tags = []
         quiz = self.create(**kwargs)
 
-        for tag_data in tags:
-            tag = Tag.objects.get_or_create(tag=tag_data)
-            quiz.tags.add(tag)
+        if tags is not None:
+            quiz.tags.add(*tags)
 
-        number = 1
-        for question_data in questions:
-            variants = question_data.pop('variants', [])
-            question = Question.objects.create(number=number, quiz=quiz, **question_data)
-            for variant_data in variants:
-                Variant.objects.create(question=question, **variant_data)
-            number += 1
+        if questions is not None:
+            quiz.add_questions(*questions)
 
+        quiz.save()
         return quiz
 
 
@@ -56,6 +47,37 @@ class Quiz(models.Model):
     old_version = models.ForeignKey('Quiz', on_delete=models.CASCADE, null=True)
 
     objects = QuizManager()
+
+    def update(self, title=None, description=None,  questions=None, tags=None):
+        if title is description is questions is tags is None:
+            return self
+
+        if title is not None:
+            self.title = title
+        if description is not None:
+            self.description = description
+
+        if tags is not None:
+            self.tags.set(tags)
+
+        if questions is not None:
+            self.set_questions(*questions)
+
+        self.save()
+        return self
+
+    def add_questions(self, *questions):
+        number = 1
+        for question_data in questions:
+            variants = question_data.pop('variants', [])
+            question = Question.objects.create(number=number, quiz=self, **question_data)
+            for variant_data in variants:
+                Variant.objects.create(question=question, **variant_data)
+            number += 1
+
+    def set_questions(self, *questions):
+        self.questions.all().delete()
+        self.add_questions(*questions)
 
 
 class Question(models.Model):
@@ -78,7 +100,7 @@ class Question(models.Model):
                                          'Для Single вопросов массив состоит из одного элемента.\n'
                                          'Для Sequence важен порядок.'
     )
-    time = models.TimeField(null=True, help_text='Таймер. Null означает, что таймера нет.')
+    timer = models.TimeField(null=True, help_text='Таймер. Null означает, что таймера нет.')
     points = models.IntegerField(help_text='Очки за правильный ответ')
 
     class Meta:
@@ -94,5 +116,12 @@ class Variant(models.Model):
         unique_together = ('variant', 'question')
 
 
+class TagManager(models.Manager):
+    def get_or_create_tags(self, tags):
+        return tuple(map(lambda tag: self.get_or_create(tag=tag)[0], tags))
+
+
 class Tag(models.Model):
     tag = models.CharField(max_length=50, unique=True, db_index=True)
+
+    objects = TagManager()
