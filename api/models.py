@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
@@ -51,6 +53,8 @@ class Quiz(models.Model):
     def update(self, title=None, description=None,  questions=None, tags=None):
         if title is description is questions is tags is None:
             return self
+
+        self.version_date = datetime.now()
 
         if title is not None:
             self.title = title
