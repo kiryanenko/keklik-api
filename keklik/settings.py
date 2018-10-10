@@ -27,6 +27,8 @@ DEBUG = bool(os.environ.get('KEKLIK_API_DEBUG', True))
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
+    'keklik.xyz',
+    'api.keklik.xyz',
     'keklik-api.herokuapp.com',
     'keklik.herokuapp.com'
 ]
@@ -144,6 +146,7 @@ STATIC_URL = '/static/'
 
 
 CORS_ORIGIN_WHITELIST = (
+    'keklik.xyz',
     'keklik.herokuapp.com',
     'keklik-dev.herokuapp.com',
     'localhost',
@@ -152,6 +155,8 @@ CORS_ORIGIN_WHITELIST = (
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = (
+    'keklik.xyz',
+    'api.keklik.xyz',
     'keklik-api.herokuapp.com',
     'keklik.herokuapp.com',
     'keklik-dev.herokuapp.com',
