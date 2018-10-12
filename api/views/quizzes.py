@@ -1,8 +1,8 @@
 from rest_framework import permissions, filters
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, get_object_or_404
 from rest_framework.viewsets import ModelViewSet
 
-from api.models import Quiz
+from api.models import Quiz, User
 from api.serializers import QuizSerializer
 
 
@@ -29,7 +29,8 @@ class UserQuizzesView(ListAPIView):
 
     def get_queryset(self):
         username = self.kwargs['username']
-        return Quiz.objects.filter(user__username=username, old_version__isnull=True)
+        user = get_object_or_404(User, username=username)
+        return Quiz.objects.filter(user=user, old_version__isnull=True)
 
 
 class CurrentUserQuizzesView(UserQuizzesView):
