@@ -85,7 +85,7 @@ class Question(models.Model):
                                          'Для Single вопросов массив состоит из одного элемента.\n'
                                          'Для Sequence важен порядок.'
     )
-    timer = models.TimeField(null=True, help_text='Таймер. Null означает, что таймера нет.')
+    timer = models.DurationField(null=True, help_text='Таймер. Null означает, что таймера нет.')
     points = models.IntegerField(help_text='Очки за правильный ответ')
 
     class Meta:

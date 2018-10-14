@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from api.models import User
-from api.serializers import CredentialsSerializer, UserSerializer, ChangePasswordSerializer
+from api.serializers.user import CredentialsSerializer, UserSerializer, ChangePasswordSerializer
 
 
 def status_text(status_code):

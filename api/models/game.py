@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
@@ -25,6 +27,17 @@ class Game(models.Model):
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     finished_at = models.DateTimeField(null=True, db_index=True)
 
+    @property
+    def timer(self):
+        if self.current_question is None:
+            return None
+
+        timer = self.current_question.question.timer
+        if timer is None:
+            return None
+
+        return datetime.now() - self.updated_at - timer
+
 
 class GeneratedQuestion(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
@@ -32,6 +45,26 @@ class GeneratedQuestion(models.Model):
     variants_order = ArrayField(
         models.IntegerField(), help_text='ID вариантов. При создании новой игры варианты перемешиваются.'
     )
+
+    @property
+    def number(self):
+        return self.question.number
+
+    @property
+    def type(self):
+        return self.question.type
+
+    @property
+    def answer(self):
+        return self.question.answer
+
+    @property
+    def timer(self):
+        return self.question.timer
+
+    @property
+    def points(self):
+        return self.question.points
 
 
 class Player(models.Model):

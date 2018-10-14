@@ -3,7 +3,7 @@ from rest_framework.generics import ListAPIView, get_object_or_404
 from rest_framework.viewsets import ModelViewSet
 
 from api.models import Quiz, User
-from api.serializers import QuizSerializer
+from api.serializers.quiz import QuizSerializer
 
 
 class QuizViewSet(ModelViewSet):
