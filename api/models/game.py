@@ -18,7 +18,7 @@ class Game(models.Model):
         ('finish', 'Финиш'),
     )
     state = models.CharField(max_length=15, choices=STATE_CHOICES, db_index=True)
-    current_question = models.ForeignKey('GeneratedQuestion', on_delete=models.CASCADE, null=True)
+    current_question = models.ForeignKey('GeneratedQuestion', on_delete=models.CASCADE, null=True, related_name='+')
     timer_on = models.BooleanField(default=True, db_index=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
