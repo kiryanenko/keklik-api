@@ -29,9 +29,17 @@ class GameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Game
-        fields = ('id', 'quiz', 'pin', 'title', 'user',
+        fields = ('id', 'quiz', 'title', 'user',
                   'online', 'state', 'current_question', 'timer_on', 'timer',
                   'created_at', 'updated_at', 'finished_at')
-        read_only_fields = ('id', 'pin', 'user',
-                            'state', 'current_question', 'timer',
+        read_only_fields = ('user', 'state', 'current_question', 'timer',
                             'created_at', 'updated_at', 'finished_at')
+
+
+class CreateGameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Game
+        fields = ('quiz', 'title', 'online')
+
+    def create(self, validated_data):
+        return Game.objects.new_game(user=self.context['user'], **validated_data)

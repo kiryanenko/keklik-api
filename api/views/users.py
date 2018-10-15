@@ -1,5 +1,3 @@
-from http.client import responses
-
 from django.contrib.auth import login, logout
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, permissions, mixins
@@ -11,10 +9,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from api.models import User
 from api.serializers.user import CredentialsSerializer, UserSerializer, ChangePasswordSerializer
-
-
-def status_text(status_code):
-    return responses.get(status_code, '')
+from api.utils.views import status_text
 
 
 class SessionView(ObtainAuthToken):
@@ -70,7 +65,6 @@ class CurrentUserView(GenericAPIView):
     @swagger_auto_schema(
         operation_id='current_profile',
         operation_summary='Профиль текущего юзера',
-        request_body=None,
         responses={
             status.HTTP_200_OK: UserSerializer,
             status.HTTP_403_FORBIDDEN: status_text(status.HTTP_403_FORBIDDEN)

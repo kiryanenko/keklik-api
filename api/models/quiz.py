@@ -67,8 +67,8 @@ class Quiz(models.Model):
 
 class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')
-    number = models.IntegerField(db_index=True, help_text='Номер вопроса, начиная с 1.\n'
-                                                          'Соответствует порядковому номеру в массиве.')
+    number = models.SmallIntegerField(db_index=True, help_text='Номер вопроса, начиная с 1.\n'
+                                                               'Соответствует порядковому номеру в массиве.')
 
     TYPE_CHOICES = (
         ('single', 'Single - один верный ответ'),

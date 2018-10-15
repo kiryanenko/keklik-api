@@ -1,4 +1,5 @@
 from datetime import datetime
+from random import random
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
@@ -6,9 +7,18 @@ from django.db import models
 from api.models import Quiz, User, Question
 
 
+class GameManager(models.Manager):
+    def new_game(self, quiz, title, online, user):
+        game = self.create(quiz=quiz, title=title, online=online, user=user)
+
+        for question in quiz.questions.all():
+            GeneratedQuestion.objects.generate(game, question)
+
+        return game
+
+
 class Game(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
-    pin = models.CharField(max_length=10, db_index=True)
     title = models.CharField(max_length=300)
     online = models.BooleanField(db_index=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -27,6 +37,8 @@ class Game(models.Model):
     updated_at = models.DateTimeField(auto_now=True, db_index=True)
     finished_at = models.DateTimeField(null=True, db_index=True)
 
+    objects = GameManager()
+
     @property
     def timer(self):
         if self.current_question is None:
@@ -39,12 +51,20 @@ class Game(models.Model):
         return datetime.now() - self.updated_at - timer
 
 
+class GeneratedQuestionManager(models.Manager):
+    def generate(self, game, question):
+        variants_order = random.shuffle(map(lambda variant: variant.id, question.variants))
+        return self.create(game=game, question=question, variants_order=variants_order)
+
+
 class GeneratedQuestion(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     variants_order = ArrayField(
         models.IntegerField(), help_text='ID вариантов. При создании новой игры варианты перемешиваются.'
     )
+
+    objects = GeneratedQuestionManager()
 
     @property
     def number(self):
