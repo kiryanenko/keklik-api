@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'channels',
+    'channels_api',
     'corsheaders',
     'drf_yasg',
     'api'
@@ -163,6 +165,19 @@ CSRF_TRUSTED_ORIGINS = (
     'localhost',
     'localhost:3000',
 )
+
+
+# Channels
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "asgi_redis.core.RedisChannelLayer",
+        "ROUTING": "keklik.routing.channel_routing",
+        "CONFIG": {
+            "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379')],
+        },
+    },
+}
 
 
 SWAGGER_SETTINGS = {
