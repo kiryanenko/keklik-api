@@ -6,16 +6,18 @@ from api.models import User
 
 
 class CredentialsSerializer(serializers.ModelSerializer):
+    session_key = serializers.CharField(read_only=True)
+
     class Meta:
         model = User
         fields = (
-            'username', 'password', 'token',
+            'username', 'password', 'token', 'session_key',
             'email', 'phone',
             'last_name', 'first_name', 'patronymic',
             'gender', 'birth_date'
         )
         read_only_fields = (
-            'token',
+            'token', 'session_key',
             'email', 'phone',
             'last_name', 'first_name', 'patronymic',
             'gender', 'birth_date'
@@ -32,6 +34,11 @@ class CredentialsSerializer(serializers.ModelSerializer):
     def validate_password(self, value):
         password_validation.validate_password(value)
         return value
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['session_key'] = self.context['request'].session.session_key
+        return ret
 
 
 class UserSerializer(serializers.ModelSerializer):

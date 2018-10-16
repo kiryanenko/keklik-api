@@ -27,7 +27,7 @@ class SessionView(ObtainAuthToken):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         login(request, user)
-        return Response(CredentialsSerializer(user).data)
+        return Response(CredentialsSerializer(user, context={'request': request}).data)
 
     @swagger_auto_schema(
         operation_summary='Sign Out',
@@ -55,7 +55,7 @@ class UserViewSet(mixins.CreateModelMixin, GenericViewSet):
 
         user = serializer.save()
         login(request, user)
-        return Response(CredentialsSerializer(user).data, status=status.HTTP_201_CREATED)
+        return Response(CredentialsSerializer(user, context={'request': request}).data, status=status.HTTP_201_CREATED)
 
 
 class CurrentUserView(GenericAPIView):
