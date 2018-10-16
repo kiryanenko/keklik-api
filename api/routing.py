@@ -5,7 +5,6 @@ from api.bindings import GameBinding
 
 
 class APIDemultiplexer(WebsocketDemultiplexer):
-
     consumers = {
       'games': GameBinding.consumer
     }
