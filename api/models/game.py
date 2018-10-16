@@ -3,6 +3,7 @@ from random import random
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from rest_framework.exceptions import APIException, ValidationError
 
 from api.models import Quiz, User, Question
 
@@ -29,12 +30,17 @@ class Game(models.Model):
         ('check', 'Показ правильного ответа'),
         ('finish', 'Финиш'),
     )
-    state = models.CharField(max_length=15, choices=STATE_CHOICES, db_index=True)
+    state = models.CharField(max_length=15, choices=STATE_CHOICES, db_index=True, default='players_waiting')
     current_question = models.ForeignKey('GeneratedQuestion', on_delete=models.CASCADE, null=True, related_name='+')
     timer_on = models.BooleanField(default=True, db_index=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True,
+                                      help_text='Дата обновляется при любых обновлениях снапшота игры: '
+                                                'изменении модели, присоединение игрока, при новом ответе и т.д.')
+    state_changed_at = models.DateTimeField(auto_now_add=True,
+                                            help_text='Дата обновляется при изменении состояния `state` '
+                                                      'и при изменении вопроса `current_question`.')
     finished_at = models.DateTimeField(null=True, db_index=True)
 
     objects = GameManager()
@@ -49,6 +55,14 @@ class Game(models.Model):
             return None
 
         return datetime.now() - self.updated_at - timer
+
+    def join(self, user):
+        if self.state != 'players_waiting':
+            raise ValidationError(detail='Game state is not "players_waiting".', code='not_players_waiting')
+
+        player = Player.objects.get_or_create(game=self, user=user)
+        self.save()
+        return player
 
 
 class GeneratedQuestionManager(models.Manager):
@@ -89,7 +103,7 @@ class GeneratedQuestion(models.Model):
 
 class Player(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    game = models.ForeignKey(Game, on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='players')
     created_at = models.DateTimeField(auto_now_add=True)
     finished_at = models.DateTimeField(null=True, db_index=True)
 

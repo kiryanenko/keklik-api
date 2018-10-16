@@ -14,7 +14,7 @@ class GameBinding(mixins.SubscribeModelMixin, ReadOnlyResourceBinding):
 
     @detail_action()
     def join(self, pk, data=None, **kwargs):
-        game = self.get_object(pk)
-        Player.objects.create(game=game)
-        return {}, 200
-
+        game = self.get_object_or_404(pk)
+        player = game.join(self.user)
+        game.save()
+        return GameSerializer(game).data, 200

@@ -40,9 +40,9 @@ class GameSerializer(serializers.ModelSerializer):
         model = Game
         fields = ('id', 'quiz', 'title', 'user', 'players',
                   'online', 'state', 'current_question', 'timer_on', 'timer',
-                  'created_at', 'updated_at', 'finished_at')
+                  'created_at', 'updated_at', 'state_changed_at', 'finished_at')
         read_only_fields = ('user', 'players', 'state', 'current_question', 'timer',
-                            'created_at', 'updated_at', 'finished_at')
+                            'created_at', 'updated_at', 'state_changed_at', 'finished_at')
 
 
 class CreateGameSerializer(serializers.ModelSerializer):
