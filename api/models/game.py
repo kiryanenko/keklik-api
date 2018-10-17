@@ -60,8 +60,9 @@ class Game(models.Model):
         if self.state != 'players_waiting':
             raise ValidationError(detail='Game state is not "players_waiting".', code='not_players_waiting')
 
-        player = Player.objects.get_or_create(game=self, user=user)
-        self.save()
+        player, created = Player.objects.get_or_create(game=self, user=user)
+        if created:
+            self.save()
         return player
 
 

@@ -46,7 +46,7 @@
     
 3. Следить за приходом сообщений от издателей *(событий)*
 
-    **Ответ:**
+    **Рассылка:**
     
     ```json
     {
@@ -92,117 +92,78 @@
 }
 ```
 
+
 ## Подписки
 
-### 
-    **Запрос:**
+### Обновление снапшота игры `update`
 
-    ```json
-    {
-      "stream": "games",
-      "payload": {
-        "action": "join",
-        "pk": 1,
-        "request_id": "Идентификатор запроса (не обязательно)"
-      }
+**Запрос:**
+
+```json
+{
+  "stream": "games",
+  "payload": {
+    "action": "subscribe",
+    "pk": 1,
+    "data": {
+      "action": "update"
     }
-    ```
+  }
+}
+```
 
-    **Ответ:**
-    
-    ```json
-    {
-      "stream": "games",
-      "payload": {
-        "errors": [], 
-        "data": {
-          "id": 1,
-          "quiz": {
-            "id": 1,
-            "title": "string",
-            "description": "string",
-            "user": {
-              "username": "string",
-              "email": "user@example.com",
-              "phone": "string",
-              "last_name": "string",
-              "first_name": "string",
-              "patronymic": "string",
-              "gender": "M",
-              "birth_date": "2018-10-15",
-              "rating": 1000
-            },
-            "tags": [
-              "string"
-            ],
-            "questions": [
-              {
-                "id": 1,
-                "number": 1,
-                "type": "single",
-                "question": "string",
-                "variants": [
-                  {
-                    "id": 1,
-                    "variant": "string"
-                  }
-                ],
-                "answer": [1],
-                "timer": 60,
-                "points": 10
-              }
-            ],
-            "rating": 1000,
-            "version_date": "2018-10-15T22:09:17.751Z"
-          },
-          "title": "string",
-          "user": {
-            "username": "string",
-            "email": "user@example.com",
-            "phone": "string",
-            "last_name": "string",
-            "first_name": "string",
-            "patronymic": "string",
-            "gender": "M",
-            "birth_date": "2018-10-15",
-            "rating": 1000
-          },
-          "players": [
-            {
-              "id": 1,
-              "user": {
-                "username": "string",
-                "email": "user@example.com",
-                "phone": "string",
-                "last_name": "string",
-                "first_name": "string",
-                "patronymic": "string",
-                "gender": "M",
-                "birth_date": "2018-10-15",
-                "rating": 1000
-              },
-              "created_at": "2018-10-15T22:09:17.751Z",
-              "finished_at": null
-            }
-          ],
-          "online": true,
-          "state": "players_waiting",
-          "current_question": null,
-          "timer_on": false,
-          "timer": 60,
-          "created_at": "2018-10-15T22:09:17.751Z",
-          "updated_at": "2018-10-15T22:09:17.751Z",
-          "finished_at": null
-        }, 
-        "action": "subscribe", 
-        "response_status": 200, 
-        "request_id": "Идентификатор запроса"
-      }
+**Рассылка:**
+
+```json
+{
+  "stream": "games", 
+  "payload": {
+    "action": "join", 
+    "pk": 1, 
+    "data": GAME_SNAPSHOT, 
+    "model": "api.game"
+  }
+}
+```
+
+
+### Присоединился игрок `join`
+
+**Запрос:**
+
+```json
+{
+  "stream": "games",
+  "payload": {
+    "action": "subscribe",
+    "pk": 1,
+    "data": {
+      "action": "join"
     }
-    ```
-    
-4. 
+  }
+}
+```
 
-## Для учителя
+**Рассылка:**
 
-
+```json
+{
+  "stream": "games", 
+  "payload": {
+    "action": "join", 
+    "pk": 1, 
+    "data": {
+      "id": 1, 
+      "user": {
+        "username": "string", "email": "", "phone": "", 
+        "last_name": "", "first_name": "", "patronymic": "", 
+        "gender": "", "birth_date": null, 
+        "rating": 0
+      }, 
+      "created_at": "2018-10-16T20:18:34.007352Z", 
+      "finished_at": null
+    }, 
+    "model": "Player"
+  }
+}
+```
