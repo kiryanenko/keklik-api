@@ -3,7 +3,7 @@ from random import random
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from rest_framework.exceptions import APIException, ValidationError
+from rest_framework.exceptions import ValidationError
 
 from api.models import Quiz, User, Question
 
@@ -65,6 +65,11 @@ class Game(models.Model):
             self.save()
         return player
 
+    def next_question(self):
+        # TODO: Next question
+        # self.current_question = self.generated_questions.next
+        self.save()
+
 
 class GeneratedQuestionManager(models.Manager):
     def generate(self, game, question):
@@ -74,7 +79,7 @@ class GeneratedQuestionManager(models.Manager):
 
 class GeneratedQuestion(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='generated_questions')
     variants_order = ArrayField(
         models.IntegerField(), help_text='ID вариантов. При создании новой игры варианты перемешиваются.'
     )
