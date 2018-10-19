@@ -10,8 +10,8 @@ from api.models import Quiz, User, Question
 
 
 class GameManager(models.Manager):
-    def new_game(self, quiz, title, online, user):
-        game = self.create(quiz=quiz, title=title, online=online, user=user)
+    def new_game(self, quiz, label, online, user):
+        game = self.create(quiz=quiz, label=label, online=online, user=user)
 
         for question in quiz.questions.all():
             GeneratedQuestion.objects.generate(game, question)
@@ -63,8 +63,7 @@ class Game(models.Model):
         timer = self.current_question.question.timer
         if timer is None:
             return None
-        t = datetime.utcnow() - self.state_changed_at
-        t1 = t - timer
+
         return datetime.now() - self.state_changed_at - timer
 
     def join(self, user):
