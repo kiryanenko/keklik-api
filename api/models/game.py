@@ -1,5 +1,5 @@
 from datetime import datetime
-from random import random
+import random
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
@@ -10,7 +10,7 @@ from api.models import Quiz, User, Question
 
 
 class GameManager(models.Manager):
-    def new_game(self, quiz, label, online, user):
+    def new_game(self, quiz, user, label='', online=False):
         game = self.create(quiz=quiz, label=label, online=online, user=user)
 
         for question in quiz.questions.all():
@@ -102,7 +102,8 @@ class Game(models.Model):
 
 class GeneratedQuestionManager(models.Manager):
     def generate(self, game, question):
-        variants_order = random.shuffle(map(lambda variant: variant.id, question.variants))
+        variants_order = list(map(lambda variant: variant.pk, question.variants.all()))
+        random.shuffle(variants_order)
         return self.create(game=game, question=question, variants_order=variants_order)
 
     @property
