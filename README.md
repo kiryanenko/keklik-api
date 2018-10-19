@@ -227,3 +227,34 @@
   }
 }
 ```
+
+### Завершение игры `finish`
+
+**Запрос:**
+
+```json
+{
+  "stream": "games",
+  "payload": {
+    "action": "subscribe",
+    "pk": 1,
+    "data": {
+      "action": "finish"
+    }
+  }
+}
+```
+
+**Рассылка:**
+
+```json
+{
+  "stream": "games", 
+  "payload": {
+    "action": "finish", 
+    "pk": 1, 
+    "data": GAME_SNAPSHOT, 
+    "model": "api.game"
+  }
+}
+```
