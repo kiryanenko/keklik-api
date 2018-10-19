@@ -19,3 +19,14 @@ class BindingsTests(ChannelTestCase):
 
         received = client.receive()
         self.assertIsNotNone(received)
+
+    def test_next_question_subscription(self):
+        game = Game.objects.first()
+
+        client = WSClient()
+        client.join_group(GameBinding.group_name(GameBinding.NEXT_QUESTION_SUB, game.pk))
+
+        game.next_question()
+
+        received = client.receive()
+        self.assertIsNotNone(received)

@@ -16,8 +16,8 @@
     "model": "api.question",
     "pk": 2,
     "fields": {
-      "quiz": 4,
-      "number": 1,
+      "quiz": 1,
+      "number": 2,
       "type": "single",
       "question": "string",
       "answer": "[\"0\"]",
@@ -29,8 +29,8 @@
     "model": "api.question",
     "pk": 3,
     "fields": {
-      "quiz": 5,
-      "number": 1,
+      "quiz": 1,
+      "number": 3,
       "type": "single",
       "question": "string",
       "answer": "[\"0\"]",

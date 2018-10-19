@@ -1,0 +1,29 @@
+[
+  {
+    "model": "api.generatedquestion",
+    "pk": 1,
+    "fields": {
+      "game": 1,
+      "question": 1,
+      "variants_order": "[\"1\"]"
+    }
+  },
+  {
+    "model": "api.generatedquestion",
+    "pk": 2,
+    "fields": {
+      "game": 1,
+      "question": 2,
+      "variants_order": "[\"2\"]"
+    }
+  },
+  {
+    "model": "api.generatedquestion",
+    "pk": 3,
+    "fields": {
+      "game": 1,
+      "question": 3,
+      "variants_order": "[\"3\"]"
+    }
+  }
+]

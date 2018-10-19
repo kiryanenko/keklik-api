@@ -2,6 +2,7 @@ language: python
 cache: pip
 services:
   - postgresql
+  - redis-server
 python:
   - 3.6
 addons:

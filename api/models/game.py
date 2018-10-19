@@ -21,7 +21,7 @@ class GameManager(models.Manager):
 
 class Game(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
-    title = models.CharField(max_length=300)
+    label = models.CharField(max_length=300, blank=True)
     online = models.BooleanField(db_index=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
@@ -63,8 +63,9 @@ class Game(models.Model):
         timer = self.current_question.question.timer
         if timer is None:
             return None
-
-        return datetime.now() - self.updated_at - timer
+        t = datetime.utcnow() - self.state_changed_at
+        t1 = t - timer
+        return datetime.now() - self.state_changed_at - timer
 
     def join(self, user):
         if self.state != self.PLAYERS_WAITING_STATE:
@@ -82,16 +83,18 @@ class Game(models.Model):
 
         try:
             if self.current_question is None:
-                self.current_question = self.generated_questions.first_question()
+                self.current_question = self.generated_questions.first_question
             else:
                 self.current_question = self.current_question.next
             self.state = self.ANSWERING_STATE
+            self.state_changed_at.now()
             self.save()
             self.question_changed.send(self)
 
         except GeneratedQuestion.DoesNotExist:
             self.current_question = None
             self.state = self.FINISH_STATE
+            self.state_changed_at.now()
             self.save()
             self.finished.send(self)
 
