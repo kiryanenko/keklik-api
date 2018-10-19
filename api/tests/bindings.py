@@ -19,6 +19,10 @@ class BindingsTests(ChannelTestCase):
 
         received = client.receive()
         self.assertIsNotNone(received)
+        self.assertEqual(received['stream'], GameBinding.stream)
+        self.assertEqual(received['payload']['action'], GameBinding.JOIN_SUB)
+        self.assertEqual(received['payload']['pk'], game.pk)
+        self.assertEqual(received['payload']['data']['user']['username'], user.username)
 
     def test_next_question_subscription(self):
         game = Game.objects.first()
@@ -26,7 +30,22 @@ class BindingsTests(ChannelTestCase):
         client = WSClient()
         client.join_group(GameBinding.group_name(GameBinding.NEXT_QUESTION_SUB, game.pk))
 
+        # Start game
         game.next_question()
 
         received = client.receive()
         self.assertIsNotNone(received)
+        self.assertEqual(received['stream'], GameBinding.stream)
+        self.assertEqual(received['payload']['action'], GameBinding.NEXT_QUESTION_SUB)
+        self.assertEqual(received['payload']['pk'], game.pk)
+        self.assertEqual(received['payload']['data']['id'], game.pk)
+
+        # Next question
+        game.next_question()
+
+        received = client.receive()
+        self.assertIsNotNone(received)
+        self.assertEqual(received['stream'], GameBinding.stream)
+        self.assertEqual(received['payload']['action'], GameBinding.NEXT_QUESTION_SUB)
+        self.assertEqual(received['payload']['pk'], game.pk)
+        self.assertEqual(received['payload']['data']['id'], game.pk)

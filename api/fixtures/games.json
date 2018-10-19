@@ -4,7 +4,7 @@
     "pk": 1,
     "fields": {
       "quiz": 1,
-      "title": "asdfasdf",
+      "label": "Game",
       "online": true,
       "user": 1,
       "state": "players_waiting",
@@ -21,7 +21,7 @@
     "pk": 2,
     "fields": {
       "quiz": 1,
-      "title": "string",
+      "label": "Last question",
       "online": true,
       "user": 1,
       "state": "",
@@ -38,7 +38,7 @@
     "pk": 3,
     "fields": {
       "quiz": 1,
-      "title": "string",
+      "label": "string",
       "online": true,
       "user": 1,
       "state": "",
@@ -55,7 +55,7 @@
     "pk": 4,
     "fields": {
       "quiz": 1,
-      "title": "string",
+      "label": "string",
       "online": true,
       "user": 1,
       "state": "",
@@ -72,7 +72,7 @@
     "pk": 5,
     "fields": {
       "quiz": 1,
-      "title": "string",
+      "label": "string",
       "online": true,
       "user": 1,
       "state": "",

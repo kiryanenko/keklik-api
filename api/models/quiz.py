@@ -52,13 +52,11 @@ class Quiz(models.Model):
         return self
 
     def add_questions(self, *questions):
-        number = 1
-        for question_data in questions:
+        for number, question_data in enumerate(questions, 1):
             variants = question_data.pop('variants', [])
             question = Question.objects.create(number=number, quiz=self, **question_data)
             for variant_data in variants:
                 Variant.objects.create(question=question, **variant_data)
-            number += 1
 
     def set_questions(self, *questions):
         self.questions.all().delete()

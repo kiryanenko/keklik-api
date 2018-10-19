@@ -1,9 +1,9 @@
-from datetime import datetime
 import random
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.dispatch import Signal
+from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 
 from api.models import Quiz, User, Question
@@ -64,7 +64,7 @@ class Game(models.Model):
         if timer is None:
             return None
 
-        return datetime.now() - self.state_changed_at - timer
+        return timezone.now() - self.state_changed_at - timer
 
     def join(self, user):
         if self.state != self.PLAYERS_WAITING_STATE:
@@ -86,14 +86,14 @@ class Game(models.Model):
             else:
                 self.current_question = self.current_question.next
             self.state = self.ANSWERING_STATE
-            self.state_changed_at.now()
+            self.state_changed_at = timezone.now()
             self.save()
             self.question_changed.send(self)
 
         except GeneratedQuestion.DoesNotExist:
             self.current_question = None
             self.state = self.FINISH_STATE
-            self.state_changed_at.now()
+            self.state_changed_at = timezone.now()
             self.save()
             self.finished.send(self)
 
@@ -142,7 +142,7 @@ class GeneratedQuestion(models.Model):
 
     @property
     def next(self):
-        return self.objects.get(game=self.game, question__number=self.number + 1)
+        return GeneratedQuestion.objects.get(game=self.game, question__number=self.number + 1)
 
 
 class Player(models.Model):
