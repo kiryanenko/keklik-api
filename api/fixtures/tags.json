@@ -1,0 +1,30 @@
+[
+  {
+    "model": "api.tag",
+    "pk": 1,
+    "fields": {
+      "tag": "tag1"
+    }
+  },
+  {
+    "model": "api.tag",
+    "pk": 2,
+    "fields": {
+      "tag": "tag2"
+    }
+  },
+  {
+    "model": "api.tag",
+    "pk": 3,
+    "fields": {
+      "tag": "Tag object (1)"
+    }
+  },
+  {
+    "model": "api.tag",
+    "pk": 4,
+    "fields": {
+      "tag": "Tag object (2)"
+    }
+  }
+]

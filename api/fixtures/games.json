@@ -1,0 +1,87 @@
+[
+  {
+    "model": "api.game",
+    "pk": 1,
+    "fields": {
+      "quiz": 1,
+      "title": "asdfasdf",
+      "online": true,
+      "user": 1,
+      "state": "players_waiting",
+      "current_question": null,
+      "timer_on": true,
+      "created_at": "2018-10-15T14:14:49.412Z",
+      "updated_at": "2018-10-18T23:01:45.496Z",
+      "state_changed_at": "2018-10-16T23:39:39.389Z",
+      "finished_at": null
+    }
+  },
+  {
+    "model": "api.game",
+    "pk": 2,
+    "fields": {
+      "quiz": 1,
+      "title": "string",
+      "online": true,
+      "user": 1,
+      "state": "",
+      "current_question": null,
+      "timer_on": true,
+      "created_at": "2018-10-15T14:17:54.779Z",
+      "updated_at": "2018-10-15T14:17:54.779Z",
+      "state_changed_at": "2018-10-16T23:39:39.389Z",
+      "finished_at": null
+    }
+  },
+  {
+    "model": "api.game",
+    "pk": 3,
+    "fields": {
+      "quiz": 1,
+      "title": "string",
+      "online": true,
+      "user": 1,
+      "state": "",
+      "current_question": null,
+      "timer_on": true,
+      "created_at": "2018-10-15T14:18:17.041Z",
+      "updated_at": "2018-10-15T14:18:17.041Z",
+      "state_changed_at": "2018-10-16T23:39:39.389Z",
+      "finished_at": null
+    }
+  },
+  {
+    "model": "api.game",
+    "pk": 4,
+    "fields": {
+      "quiz": 1,
+      "title": "string",
+      "online": true,
+      "user": 1,
+      "state": "",
+      "current_question": null,
+      "timer_on": true,
+      "created_at": "2018-10-15T14:20:20.384Z",
+      "updated_at": "2018-10-15T14:20:20.384Z",
+      "state_changed_at": "2018-10-16T23:39:39.389Z",
+      "finished_at": null
+    }
+  },
+  {
+    "model": "api.game",
+    "pk": 5,
+    "fields": {
+      "quiz": 1,
+      "title": "string",
+      "online": true,
+      "user": 1,
+      "state": "",
+      "current_question": null,
+      "timer_on": true,
+      "created_at": "2018-10-15T14:21:44.019Z",
+      "updated_at": "2018-10-15T14:21:44.019Z",
+      "state_changed_at": "2018-10-16T23:39:39.389Z",
+      "finished_at": null
+    }
+  }
+]

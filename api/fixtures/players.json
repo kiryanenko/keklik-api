@@ -1,0 +1,12 @@
+[
+  {
+    "model": "api.player",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "game": 1,
+      "created_at": "2018-10-18T22:18:01.410Z",
+      "finished_at": null
+    }
+  }
+]

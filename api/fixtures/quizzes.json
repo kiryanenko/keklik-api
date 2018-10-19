@@ -1,0 +1,143 @@
+[
+  {
+    "model": "api.quiz",
+    "pk": 1,
+    "fields": {
+      "title": "string",
+      "description": "string",
+      "user": 1,
+      "rating": 0,
+      "version_date": "2018-10-05T21:13:00.236Z",
+      "old_version": null,
+      "tags": [
+        1,
+        2
+      ]
+    }
+  },
+  {
+    "model": "api.quiz",
+    "pk": 2,
+    "fields": {
+      "title": "string",
+      "description": "string",
+      "user": 1,
+      "rating": 0,
+      "version_date": "2018-10-05T21:15:14.007Z",
+      "old_version": null,
+      "tags": []
+    }
+  },
+  {
+    "model": "api.quiz",
+    "pk": 3,
+    "fields": {
+      "title": "string",
+      "description": "string",
+      "user": 1,
+      "rating": 0,
+      "version_date": "2018-10-05T21:15:15.897Z",
+      "old_version": null,
+      "tags": [
+        1
+      ]
+    }
+  },
+  {
+    "model": "api.quiz",
+    "pk": 4,
+    "fields": {
+      "title": "string",
+      "description": "string",
+      "user": 1,
+      "rating": 0,
+      "version_date": "2018-10-05T21:19:17.938Z",
+      "old_version": null,
+      "tags": []
+    }
+  },
+  {
+    "model": "api.quiz",
+    "pk": 5,
+    "fields": {
+      "title": "string",
+      "description": "string",
+      "user": 1,
+      "rating": 0,
+      "version_date": "2018-10-05T21:19:48.995Z",
+      "old_version": null,
+      "tags": []
+    }
+  },
+  {
+    "model": "api.quiz",
+    "pk": 6,
+    "fields": {
+      "title": "string",
+      "description": "string",
+      "user": 1,
+      "rating": 0,
+      "version_date": "2018-10-05T21:19:52.032Z",
+      "old_version": null,
+      "tags": [
+        1,
+        2
+      ]
+    }
+  },
+  {
+    "model": "api.quiz",
+    "pk": 7,
+    "fields": {
+      "title": "string",
+      "description": "string",
+      "user": 1,
+      "rating": 0,
+      "version_date": "2018-10-05T23:21:22.752Z",
+      "old_version": null,
+      "tags": [
+        1,
+        2
+      ]
+    }
+  },
+  {
+    "model": "api.quiz",
+    "pk": 8,
+    "fields": {
+      "title": "string",
+      "description": "string",
+      "user": 1,
+      "rating": 0,
+      "version_date": "2018-10-05T23:32:23.407Z",
+      "old_version": null,
+      "tags": []
+    }
+  },
+  {
+    "model": "api.quiz",
+    "pk": 9,
+    "fields": {
+      "title": "string",
+      "description": "string",
+      "user": 1,
+      "rating": 0,
+      "version_date": "2018-10-05T23:34:05.363Z",
+      "old_version": null,
+      "tags": []
+    }
+  },
+  {
+    "model": "api.quiz",
+    "pk": 10,
+    "fields": {
+      "title": "string",
+      "description": "string",
+      "user": 1,
+      "rating": 0,
+      "version_date": "2018-10-05T23:34:22.446Z",
+      "old_version": null,
+      "tags": []
+    }
+  }
+]

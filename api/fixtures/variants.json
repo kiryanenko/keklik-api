@@ -1,0 +1,82 @@
+[
+  {
+    "model": "api.variant",
+    "pk": 1,
+    "fields": {
+      "question": 1,
+      "variant": "string"
+    }
+  },
+  {
+    "model": "api.variant",
+    "pk": 2,
+    "fields": {
+      "question": 2,
+      "variant": "string"
+    }
+  },
+  {
+    "model": "api.variant",
+    "pk": 3,
+    "fields": {
+      "question": 3,
+      "variant": "string"
+    }
+  },
+  {
+    "model": "api.variant",
+    "pk": 4,
+    "fields": {
+      "question": 4,
+      "variant": "string"
+    }
+  },
+  {
+    "model": "api.variant",
+    "pk": 5,
+    "fields": {
+      "question": 5,
+      "variant": "string"
+    }
+  },
+  {
+    "model": "api.variant",
+    "pk": 6,
+    "fields": {
+      "question": 6,
+      "variant": "string"
+    }
+  },
+  {
+    "model": "api.variant",
+    "pk": 7,
+    "fields": {
+      "question": 7,
+      "variant": "string"
+    }
+  },
+  {
+    "model": "api.variant",
+    "pk": 8,
+    "fields": {
+      "question": 8,
+      "variant": "string"
+    }
+  },
+  {
+    "model": "api.variant",
+    "pk": 9,
+    "fields": {
+      "question": 9,
+      "variant": "string"
+    }
+  },
+  {
+    "model": "api.variant",
+    "pk": 10,
+    "fields": {
+      "question": 10,
+      "variant": "string"
+    }
+  }
+]

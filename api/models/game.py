@@ -3,6 +3,7 @@ from random import random
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django.dispatch import Signal
 from rest_framework.exceptions import ValidationError
 
 from api.models import Quiz, User, Question
@@ -24,13 +25,18 @@ class Game(models.Model):
     online = models.BooleanField(db_index=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    PLAYERS_WAITING_STATE = 'players_waiting'
+    ANSWERING_STATE = 'answering'
+    CHECK_STATE = 'check'
+    FINISH_STATE = 'finish'
     STATE_CHOICES = (
-        ('players_waiting', 'Ожидание игроков'),
-        ('answering', 'Игроки отвечают на вопросы'),
-        ('check', 'Показ правильного ответа'),
-        ('finish', 'Финиш'),
+        (PLAYERS_WAITING_STATE, 'Ожидание игроков'),
+        (ANSWERING_STATE, 'Игроки отвечают на вопросы'),
+        (CHECK_STATE, 'Показ правильного ответа'),
+        (FINISH_STATE, 'Финиш'),
     )
-    state = models.CharField(max_length=15, choices=STATE_CHOICES, db_index=True, default='players_waiting')
+    state = models.CharField(max_length=15, choices=STATE_CHOICES, db_index=True, default=PLAYERS_WAITING_STATE)
+
     current_question = models.ForeignKey('GeneratedQuestion', on_delete=models.CASCADE, null=True, related_name='+')
     timer_on = models.BooleanField(default=True, db_index=True)
 
@@ -45,6 +51,10 @@ class Game(models.Model):
 
     objects = GameManager()
 
+    joined_player = Signal(providing_args=['player'])
+    question_changed = Signal()
+    finished = Signal()
+
     @property
     def timer(self):
         if self.current_question is None:
@@ -57,18 +67,35 @@ class Game(models.Model):
         return datetime.now() - self.updated_at - timer
 
     def join(self, user):
-        if self.state != 'players_waiting':
+        if self.state != self.PLAYERS_WAITING_STATE:
             raise ValidationError(detail='Game state is not "players_waiting".', code='not_players_waiting')
 
         player, created = Player.objects.get_or_create(game=self, user=user)
         if created:
             self.save()
+            self.joined_player.send(self, player=player)
         return player
 
     def next_question(self):
-        # TODO: Next question
-        # self.current_question = self.generated_questions.next
-        self.save()
+        if self.state == self.FINISH_STATE:
+            return self.current_question
+
+        try:
+            if self.current_question is None:
+                self.current_question = self.generated_questions.first_question()
+            else:
+                self.current_question = self.current_question.next
+            self.state = self.ANSWERING_STATE
+            self.save()
+            self.question_changed.send(self)
+
+        except GeneratedQuestion.DoesNotExist:
+            self.current_question = None
+            self.state = self.FINISH_STATE
+            self.save()
+            self.finished.send(self)
+
+        return self.current_question
 
 
 class GeneratedQuestionManager(models.Manager):
@@ -76,10 +103,14 @@ class GeneratedQuestionManager(models.Manager):
         variants_order = random.shuffle(map(lambda variant: variant.id, question.variants))
         return self.create(game=game, question=question, variants_order=variants_order)
 
+    @property
+    def first_question(self):
+        return self.get(question__number=1)
+
 
 class GeneratedQuestion(models.Model):
-    game = models.ForeignKey(Game, on_delete=models.CASCADE)
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='generated_questions')
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='generated_questions')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
     variants_order = ArrayField(
         models.IntegerField(), help_text='ID вариантов. При создании новой игры варианты перемешиваются.'
     )
@@ -105,6 +136,10 @@ class GeneratedQuestion(models.Model):
     @property
     def points(self):
         return self.question.points
+
+    @property
+    def next(self):
+        return self.objects.get(game=self.game, question__number=self.number + 1)
 
 
 class Player(models.Model):

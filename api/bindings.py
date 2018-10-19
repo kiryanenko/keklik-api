@@ -1,6 +1,7 @@
 from channels import Group
 from channels_api import mixins, detail_action, permissions
-from channels_api.bindings import ReadOnlyResourceBinding, ResourceBindingBase
+from channels_api.bindings import ReadOnlyResourceBinding
+from django.dispatch import receiver
 from rest_framework.exceptions import PermissionDenied
 
 from api.models import Game, Player
@@ -8,16 +9,21 @@ from api.serializers.game import GameSerializer, PlayerSerializer
 
 
 class GroupMixin(object):
-    def broadcast(self, action, pk=None, data=None, model=None):
+    @classmethod
+    def broadcast(cls, action, pk=None, data=None, model=None):
         if model is None:
-            model = self.model
+            model = cls.model
 
-        Group(self._group_name('join', pk)).send(self.encode(self.stream, {
+        Group(cls.group_name(action, pk)).send(cls.encode(cls.stream, {
             'action': action,
             'pk': pk,
             'data': data,
             'model': model.__name__
         }))
+
+    @classmethod
+    def group_name(cls, action, id=None):
+        return cls()._group_name(action, id=id)
 
 
 class GameBinding(GroupMixin, mixins.SubscribeModelMixin, ReadOnlyResourceBinding):
@@ -27,13 +33,14 @@ class GameBinding(GroupMixin, mixins.SubscribeModelMixin, ReadOnlyResourceBindin
     queryset = Game.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
 
+    JOIN_SUB = 'join'
+    NEXT_QUESTION_SUB = 'next_question'
+    FINISH_SUB = 'finish'
+
     @detail_action()
     def join(self, pk, data=None, **kwargs):
         game = self.get_object_or_404(pk)
-        player = game.join(self.user)
-
-        self.broadcast('join', pk=pk, data=PlayerSerializer(player).data, model=Player)
-
+        game.join(self.user)
         return GameSerializer(game).data, 200
 
     @detail_action()
@@ -44,7 +51,19 @@ class GameBinding(GroupMixin, mixins.SubscribeModelMixin, ReadOnlyResourceBindin
             raise PermissionDenied()
 
         game.next_question()
-
-        self.broadcast('next_question', pk=pk, data=GameSerializer(game).data, model=Player)
-
         return GameSerializer(game).data, 200
+
+    @staticmethod
+    @receiver(Game.joined_player)
+    def join_sub(sender, player, **kwargs):
+        GameBinding.broadcast(GameBinding.JOIN_SUB, pk=sender.pk, data=PlayerSerializer(player).data, model=Player)
+
+    @staticmethod
+    @receiver(Game.question_changed)
+    def next_question_sub(sender, **kwargs):
+        GameBinding.broadcast(GameBinding.NEXT_QUESTION_SUB, pk=sender.pk, data=GameSerializer(sender).data)
+
+    @staticmethod
+    @receiver(Game.finished)
+    def finish_sub(sender, **kwargs):
+        GameBinding.broadcast(GameBinding.FINISH_SUB, pk=sender.pk, data=GameSerializer(sender).data)

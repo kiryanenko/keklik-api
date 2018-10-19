@@ -1,0 +1,48 @@
+[
+  {
+    "model": "api.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$120000$wrSdoD3Dh3tC$IdGBAehz5w4tIf4kRvzE8hyNTGXKz6XB37rBVBrCIas=",
+      "last_login": "2018-10-18T21:19:36.798Z",
+      "is_superuser": false,
+      "username": "string",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2018-10-05T20:08:37.769Z",
+      "phone": "",
+      "patronymic": "",
+      "gender": "",
+      "birth_date": null,
+      "rating": 0,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "api.user",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$120000$wrSdoD3Dh3tC$IdGBAehz5w4tIf4kRvzE8hyNTGXKz6XB37rBVBrCIas=",
+      "last_login": "2018-10-18T21:19:36.798Z",
+      "is_superuser": false,
+      "username": "free_user",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2018-10-05T20:08:37.769Z",
+      "phone": "",
+      "patronymic": "",
+      "gender": "",
+      "birth_date": null,
+      "rating": 0,
+      "groups": [],
+      "user_permissions": []
+    }
+  }
+]

@@ -92,6 +92,36 @@
 }
 ```
 
+### Следующий вопрос `next_question`
+
+**Запрос:**
+
+```json
+{
+  "stream": "games",
+  "payload": {
+    "action": "next_question",
+    "pk": 1,
+    "request_id": "Идентификатор запроса (не обязательно)"
+  }
+}
+```
+
+**Ответ:**
+
+```json
+{
+  "stream": "games",
+  "payload": {
+    "errors": [], 
+    "data": GAME_SNAPSHOT, 
+    "action": "next_question", 
+    "response_status": 200, 
+    "request_id": "Идентификатор запроса"
+  }
+}
+```
+
 
 ## Подписки
 
@@ -125,7 +155,6 @@
   }
 }
 ```
-
 
 ### Присоединился игрок `join`
 
@@ -164,6 +193,37 @@
       "finished_at": null
     }, 
     "model": "Player"
+  }
+}
+```
+
+### Следующий вопрос `next_question`
+
+**Запрос:**
+
+```json
+{
+  "stream": "games",
+  "payload": {
+    "action": "subscribe",
+    "pk": 1,
+    "data": {
+      "action": "next_question"
+    }
+  }
+}
+```
+
+**Рассылка:**
+
+```json
+{
+  "stream": "games", 
+  "payload": {
+    "action": "next_question", 
+    "pk": 1, 
+    "data": GAME_SNAPSHOT, 
+    "model": "api.game"
   }
 }
 ```
