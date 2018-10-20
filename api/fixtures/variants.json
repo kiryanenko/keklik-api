@@ -20,7 +20,7 @@
     "pk": 3,
     "fields": {
       "question": 3,
-      "variant": "string"
+      "variant": "Last question"
     }
   },
   {

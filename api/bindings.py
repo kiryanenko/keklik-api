@@ -35,6 +35,7 @@ class GameBinding(GroupMixin, mixins.SubscribeModelMixin, ReadOnlyResourceBindin
 
     JOIN_SUB = 'join'
     NEXT_QUESTION_SUB = 'next_question'
+    ANSWER_SUB = 'answer'
     FINISH_SUB = 'finish'
 
     @detail_action()
@@ -74,7 +75,7 @@ class GameBinding(GroupMixin, mixins.SubscribeModelMixin, ReadOnlyResourceBindin
     @staticmethod
     @receiver(Game.answered)
     def answer_sub(sender, answer,**kwargs):
-        GameBinding.broadcast(GameBinding.NEXT_QUESTION_SUB, pk=sender.pk, data=AnswerSerializer(answer).data)
+        GameBinding.broadcast(GameBinding.ANSWER_SUB, pk=sender.pk, data=AnswerSerializer(instance=answer).data)
 
     @staticmethod
     @receiver(Game.finished)
