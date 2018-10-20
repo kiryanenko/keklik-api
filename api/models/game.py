@@ -150,6 +150,10 @@ class GeneratedQuestion(models.Model):
     def next(self):
         return GeneratedQuestion.objects.get(game=self.game, question__number=self.number + 1)
 
+    @property
+    def variants(self):
+        return list(map(lambda variant_id: self.question.variants.get(id=variant_id), self.variants_order))
+
 
 class Player(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

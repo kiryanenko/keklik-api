@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError, PermissionDenied
 
 from api.models import Game, GeneratedQuestion, Question, Player, Answer
-from api.serializers.quiz import QuizSerializer
+from api.serializers.quiz import QuizSerializer, VariantSerializer
 from api.serializers.user import UserSerializer
 
 
@@ -64,6 +64,7 @@ class GeneratedQuestionSerializer(serializers.ModelSerializer):
     question = serializers.SlugRelatedField(read_only=True, slug_field='question')
     number = serializers.IntegerField(read_only=True)
     type = serializers.ChoiceField(choices=Question.TYPE_CHOICES)
+    variants = VariantSerializer(read_only=True, many=True)
     answer = serializers.ListField(
         child=serializers.IntegerField(),
         read_only=True
@@ -74,7 +75,7 @@ class GeneratedQuestionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GeneratedQuestion
-        fields = ('id', 'question', 'number', 'type', 'answer', 'players_answers', 'timer', 'points')
+        fields = ('id', 'question', 'number', 'type', 'variants', 'answer', 'players_answers', 'timer', 'points')
 
 
 class GameSerializer(serializers.ModelSerializer):
@@ -82,14 +83,15 @@ class GameSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     players = PlayerSerializer(read_only=True, many=True)
     current_question = GeneratedQuestionSerializer(read_only=True)
+    generated_questions = GeneratedQuestionSerializer(read_only=True, many=True)
     timer = serializers.DurationField(read_only=True, help_text='Оставшиеся время.')
 
     class Meta:
         model = Game
         fields = ('id', 'quiz', 'label', 'user', 'players',
-                  'online', 'state', 'current_question', 'timer_on', 'timer',
+                  'online', 'state', 'current_question', 'generated_questions', 'timer_on', 'timer',
                   'created_at', 'updated_at', 'state_changed_at', 'finished_at')
-        read_only_fields = ('user', 'players', 'state', 'current_question', 'timer',
+        read_only_fields = ('user', 'players', 'state', 'current_question', 'generated_questions', 'timer',
                             'created_at', 'updated_at', 'state_changed_at', 'finished_at')
 
 
