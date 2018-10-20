@@ -160,7 +160,7 @@ class Player(models.Model):
 
 class Answer(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
-    question = models.ForeignKey(GeneratedQuestion, on_delete=models.CASCADE)
+    question = models.ForeignKey(GeneratedQuestion, on_delete=models.CASCADE, related_name='players_answers')
     answer = ArrayField(
         models.IntegerField(), help_text='ID правильных вариантов ответов.\n'
                                          'Для Single вопросов массив состоит из одного элемента.\n'

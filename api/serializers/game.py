@@ -68,13 +68,13 @@ class GeneratedQuestionSerializer(serializers.ModelSerializer):
         child=serializers.IntegerField(),
         read_only=True
     )
-    answers = AnswerSerializer(read_only=True, many=True)
+    players_answers = AnswerSerializer(read_only=True, many=True)
     timer = serializers.DurationField(read_only=True)
     points = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = GeneratedQuestion
-        fields = ('id', 'question', 'number', 'type', 'answer', 'answers', 'timer', 'points')
+        fields = ('id', 'question', 'number', 'type', 'answer', 'players_answers', 'timer', 'points')
 
 
 class GameSerializer(serializers.ModelSerializer):
