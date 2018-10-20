@@ -23,7 +23,8 @@
     "fields": {
       "game": 1,
       "question": 3,
-      "variants_order": "[\"3\"]"
+      "variants_order": "[\"3\"]",
+      "started_at": "2018-10-15T14:14:49.412Z"
     }
   }
 ]

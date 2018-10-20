@@ -4,7 +4,7 @@ from channels_api.bindings import ReadOnlyResourceBinding
 from django.dispatch import receiver
 from rest_framework.exceptions import PermissionDenied
 
-from api.models import Game, Player
+from api.models import Game, Player, Answer
 from api.serializers.game import GameSerializer, PlayerSerializer, AnswerSerializer
 
 
@@ -75,7 +75,8 @@ class GameBinding(GroupMixin, mixins.SubscribeModelMixin, ReadOnlyResourceBindin
     @staticmethod
     @receiver(Game.answered)
     def answer_sub(sender, answer,**kwargs):
-        GameBinding.broadcast(GameBinding.ANSWER_SUB, pk=sender.pk, data=AnswerSerializer(instance=answer).data)
+        GameBinding.broadcast(GameBinding.ANSWER_SUB, pk=sender.pk, data=AnswerSerializer(instance=answer).data,
+                              model=Answer)
 
     @staticmethod
     @receiver(Game.finished)

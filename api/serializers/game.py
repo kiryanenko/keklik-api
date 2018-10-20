@@ -21,7 +21,7 @@ class AnswerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Answer
-        fields = ('question', 'answer', 'player')
+        fields = ('question', 'answer', 'player', 'correct', 'points')
         extra_kwargs = {
             'question': {'write_only': True},
         }

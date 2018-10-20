@@ -22,8 +22,9 @@ class GameManager(models.Manager):
 class Game(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
     label = models.CharField(max_length=300, blank=True)
-    online = models.BooleanField(db_index=True)
+    online = models.BooleanField(default=True, db_index=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    base_game = models.ForeignKey('Game', on_delete=models.CASCADE, null=True)
 
     PLAYERS_WAITING_STATE = 'players_waiting'
     ANSWERING_STATE = 'answering'
@@ -81,20 +82,24 @@ class Game(models.Model):
         if self.state == self.FINISH_STATE:
             return self.current_question
 
+        now = timezone.now()
+
         try:
             if self.current_question is None:
                 self.current_question = self.generated_questions.first_question
             else:
                 self.current_question = self.current_question.next
             self.state = self.ANSWERING_STATE
-            self.state_changed_at = timezone.now()
+            self.state_changed_at = now
+            self.current_question.started_at = now
             self.save()
+            self.current_question.save()
             self.question_changed.send(self)
 
         except GeneratedQuestion.DoesNotExist:
             self.current_question = None
             self.state = self.FINISH_STATE
-            self.state_changed_at = timezone.now()
+            self.state_changed_at = now
             self.save()
             self.finished.send(self)
 
@@ -104,9 +109,34 @@ class Game(models.Model):
         if question is None:
             question = self.current_question
 
-        player_answer = Answer.objects.create(question=question, player=player, answer=answer)
+        correct = question.answer == answer
+        points = self.count_points(question, correct)
+
+        player_answer, created = Answer.objects.get_or_create(
+            question=question,
+            player=player,
+            defaults={'answer': answer, 'correct': correct, 'points': points}
+        )
+        player.user.rating += points
+        if not created:
+            player.user.rating -= player_answer.points
+            player_answer.points = points
+            player_answer.save()
+            player.user.save()
+
         self.answered.send(self, answer=player_answer)
         return player_answer
+
+    @staticmethod
+    def count_points(generated_question, correct=True):
+        if not correct:
+            return 0
+
+        timer = generated_question.question.timer
+        coefficient = (timezone.now() - generated_question.started_at) / timer if timer is not None else 1
+        if coefficient < 0:
+            coefficient = 0
+        return generated_question.question.points + generated_question.question.points * coefficient
 
 
 class GeneratedQuestionManager(models.Manager):
@@ -126,6 +156,7 @@ class GeneratedQuestion(models.Model):
     variants_order = ArrayField(
         models.IntegerField(), help_text='ID вариантов. При создании новой игры варианты перемешиваются.'
     )
+    started_at = models.DateTimeField(null=True)
 
     objects = GeneratedQuestionManager()
 
@@ -173,4 +204,6 @@ class Answer(models.Model):
                                          'Для Single вопросов массив состоит из одного элемента.\n'
                                          'Для Sequence важен порядок.'
     )
+    correct = models.BooleanField(default=False)
+    points = models.IntegerField(default=0, help_text='Начисленные очки за ответ.')
     answered_at = models.DateTimeField(auto_now=True)
