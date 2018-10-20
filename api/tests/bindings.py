@@ -39,6 +39,7 @@ class BindingsTests(ChannelTestCase):
         self.assertEqual(received['payload']['action'], GameBinding.NEXT_QUESTION_SUB)
         self.assertEqual(received['payload']['pk'], game.pk)
         self.assertEqual(received['payload']['data']['id'], game.pk)
+        self.assertIsNotNone(received['payload']['data']['current_question'])
 
         # Next question
         game.next_question()
@@ -49,6 +50,7 @@ class BindingsTests(ChannelTestCase):
         self.assertEqual(received['payload']['action'], GameBinding.NEXT_QUESTION_SUB)
         self.assertEqual(received['payload']['pk'], game.pk)
         self.assertEqual(received['payload']['data']['id'], game.pk)
+        self.assertIsNotNone(received['payload']['data']['current_question'])
 
     def test_finish_subscription(self):
         game = Game.objects.get(label='Last question')

@@ -4,7 +4,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.dispatch import Signal
 from django.utils import timezone
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, PermissionDenied
 
 from api.models import Quiz, User, Question
 
@@ -53,6 +53,7 @@ class Game(models.Model):
 
     joined_player = Signal(providing_args=['player'])
     question_changed = Signal()
+    answered = Signal(providing_args=['answer'])
     finished = Signal()
 
     @property
@@ -98,6 +99,11 @@ class Game(models.Model):
             self.finished.send(self)
 
         return self.current_question
+
+    def answer(self, player, answer):
+        answer = Answer.objects.create(question=self.current_question, player=player, answer=answer)
+        self.answered.send(self, answer=answer)
+        return answer
 
 
 class GeneratedQuestionManager(models.Manager):

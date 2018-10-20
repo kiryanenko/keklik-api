@@ -5,7 +5,7 @@ from django.dispatch import receiver
 from rest_framework.exceptions import PermissionDenied
 
 from api.models import Game, Player
-from api.serializers.game import GameSerializer, PlayerSerializer
+from api.serializers.game import GameSerializer, PlayerSerializer, AnswerSerializer
 
 
 class GroupMixin(object):
@@ -53,6 +53,14 @@ class GameBinding(GroupMixin, mixins.SubscribeModelMixin, ReadOnlyResourceBindin
         game.next_question()
         return GameSerializer(game).data, 200
 
+    @detail_action()
+    def answer(self, pk, data=None, **kwargs):
+        game = self.get_object_or_404(pk)
+        serializer = AnswerSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        answer = serializer.save()
+        return serializer.data, 200
+
     @staticmethod
     @receiver(Game.joined_player)
     def join_sub(sender, player, **kwargs):
@@ -62,6 +70,11 @@ class GameBinding(GroupMixin, mixins.SubscribeModelMixin, ReadOnlyResourceBindin
     @receiver(Game.question_changed)
     def next_question_sub(sender, **kwargs):
         GameBinding.broadcast(GameBinding.NEXT_QUESTION_SUB, pk=sender.pk, data=GameSerializer(sender).data)
+
+    @staticmethod
+    @receiver(Game.answered)
+    def answer_sub(sender, answer,**kwargs):
+        GameBinding.broadcast(GameBinding.NEXT_QUESTION_SUB, pk=sender.pk, data=AnswerSerializer(answer).data)
 
     @staticmethod
     @receiver(Game.finished)
