@@ -57,7 +57,7 @@ class GameBinding(GroupMixin, mixins.SubscribeModelMixin, ReadOnlyResourceBindin
     @detail_action()
     def answer(self, pk, data=None, **kwargs):
         game = self.get_object_or_404(pk)
-        serializer = AnswerSerializer(data=data)
+        serializer = AnswerSerializer(game=game, user=self.user, data=data)
         serializer.is_valid(raise_exception=True)
         answer = serializer.save()
         return serializer.data, 200
