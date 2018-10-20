@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError, PermissionDenied
+from rest_framework.fields import empty
 
 from api.models import Game, GeneratedQuestion, Question, Player, Answer
 from api.serializers.quiz import QuizSerializer, VariantSerializer
@@ -12,10 +13,11 @@ class PlayerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
         fields = ('id', 'user', 'created_at', 'finished_at')
+        read_only_fields = ('created_at', 'finished_at')
 
 
 class AnswerSerializer(serializers.ModelSerializer):
-    player = PlayerSerializer()
+    player = PlayerSerializer(read_only=True)
 
     class Meta:
         model = Answer
@@ -24,14 +26,7 @@ class AnswerSerializer(serializers.ModelSerializer):
             'question': {'write_only': True},
         }
 
-    def __init__(self, game=None, user=None, data=None, **kwargs):
-        try:
-            data['player'] = game.players.get(user=user)
-        except Player.DoesNotExist:
-            raise PermissionDenied()
-        except AttributeError:
-            pass
-
+    def __init__(self, game=None, user=None, data=empty, **kwargs):
         super().__init__(data=data, **kwargs)
 
         self.game = game
@@ -50,6 +45,12 @@ class AnswerSerializer(serializers.ModelSerializer):
                 raise ValidationError(detail='Unknown variant id "{}". It must be in {}.'.format(variant, variants),
                                       code='unknown_variant')
 
+        try:
+            player = self.game.players.get(user=self.user)
+            data['player'] = player
+        except Player.DoesNotExist:
+            raise PermissionDenied()
+
         return data
 
     def validate_question(self, value):
@@ -57,13 +58,6 @@ class AnswerSerializer(serializers.ModelSerializer):
             raise ValidationError(detail='Be late.', code='be_late')
 
         return value
-
-    # def validate_player(self, value):
-    #     try:
-    #         player = self.game.players.get(user=self.user)
-    #         return player
-    #     except Player.DoesNotExist:
-    #         raise PermissionDenied()
 
 
 class GeneratedQuestionSerializer(serializers.ModelSerializer):
