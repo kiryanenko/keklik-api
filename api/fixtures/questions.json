@@ -33,7 +33,7 @@
       "number": 3,
       "type": "single",
       "question": "Last question?",
-      "answer": "[\"0\"]",
+      "answer": "[3]",
       "timer": "00:20:00",
       "points": 0
     }

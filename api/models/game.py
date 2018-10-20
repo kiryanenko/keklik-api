@@ -100,8 +100,11 @@ class Game(models.Model):
 
         return self.current_question
 
-    def answer(self, player, answer):
-        player_answer = Answer.objects.create(question=self.current_question, player=player, answer=answer)
+    def answer(self, player, answer, question=None):
+        if question is None:
+            question = self.current_question
+
+        player_answer = Answer.objects.create(question=question, player=player, answer=answer)
         self.answered.send(self, answer=player_answer)
         return player_answer
 

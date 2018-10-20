@@ -24,8 +24,15 @@ class AnswerSerializer(serializers.ModelSerializer):
             'question': {'write_only': True},
         }
 
-    def __init__(self, game=None, user=None, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, game=None, user=None, data=None, **kwargs):
+        try:
+            data['player'] = game.players.get(user=user)
+        except Player.DoesNotExist:
+            raise PermissionDenied()
+        except AttributeError:
+            pass
+
+        super().__init__(data=data, **kwargs)
 
         self.game = game
         self.user = user
@@ -35,29 +42,28 @@ class AnswerSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         answer = data['answer']
-        question = GeneratedQuestion.objects.get(data['question'])
+        question = data['question']
 
-        variants = question.variants.all()
+        variants = list(map(lambda var: var.pk, question.variants))
         for variant in answer:
             if variant not in variants:
-                raise ValidationError(detail='Unknown variant id "{}".'.format(variant), code='unknown_variant')
+                raise ValidationError(detail='Unknown variant id "{}". It must be in {}.'.format(variant, variants),
+                                      code='unknown_variant')
 
         return data
 
     def validate_question(self, value):
-        question = GeneratedQuestion.objects.get(value)
-
-        if self.game.current_question != question:
+        if self.game.current_question != value:
             raise ValidationError(detail='Be late.', code='be_late')
 
         return value
 
-    def validate_player(self, value):
-        try:
-            player = self.game.players.get(user=self.user)
-            return player
-        except Player.DoesNotExist:
-            raise PermissionDenied()
+    # def validate_player(self, value):
+    #     try:
+    #         player = self.game.players.get(user=self.user)
+    #         return player
+    #     except Player.DoesNotExist:
+    #         raise PermissionDenied()
 
 
 class GeneratedQuestionSerializer(serializers.ModelSerializer):
