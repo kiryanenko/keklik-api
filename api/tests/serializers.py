@@ -23,4 +23,5 @@ class SerializersTests(TestCase):
 
         player_answer = serializer.save()
         self.assertEqual(player_answer.answer, answer)
+        self.assertTrue(player_answer.correct)
         self.assertEqual(player_answer.question, game.current_question)

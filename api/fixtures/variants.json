@@ -27,8 +27,8 @@
     "model": "api.variant",
     "pk": 4,
     "fields": {
-      "question": 4,
-      "variant": "string"
+      "question": 3,
+      "variant": "Incorrect"
     }
   },
   {
