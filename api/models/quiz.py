@@ -55,8 +55,19 @@ class Quiz(models.Model):
         for number, question_data in enumerate(questions, 1):
             variants = question_data.pop('variants', [])
             question = Question.objects.create(number=number, quiz=self, **question_data)
-            for variant_data in variants:
-                Variant.objects.create(question=question, **variant_data)
+
+            # Сейчас ответ это порядковый номер в массиве вариантов его следует изменить на id варианта
+            answer_dict = {}
+
+            for var_index, variant_data in enumerate(variants, 1):
+                variant = Variant.objects.create(question=question, **variant_data)
+
+                if var_index in question.answer:
+                    answer_dict[var_index] = variant.pk
+
+            new_answer = list(map(lambda ans_key: answer_dict[ans_key], question.answer))
+            question.answer = new_answer
+            question.save()
 
     def set_questions(self, *questions):
         self.questions.all().delete()
@@ -81,7 +92,9 @@ class Question(models.Model):
     answer = ArrayField(
         models.IntegerField(), help_text='ID правильных вариантов ответов.\n'
                                          'Для Single вопросов массив состоит из одного элемента.\n'
-                                         'Для Sequence важен порядок.'
+                                         'Для Sequence важен порядок.\n'
+                                         'При создании викторины указывать порядковый номер в массиве вариантов '
+                                         '(номер начинается с 1).'
     )
     timer = models.DurationField(null=True, help_text='Таймер. Null означает, что таймера нет.')
     points = models.IntegerField(help_text='Очки за правильный ответ')
