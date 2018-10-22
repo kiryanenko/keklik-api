@@ -5,7 +5,7 @@ from api.models import Game, User
 from api.tests.utils import ALL_FIXTURES
 
 
-class BindingsTests(ChannelTestCase):
+class BindingsTest(ChannelTestCase):
     fixtures = ALL_FIXTURES
 
     def test_join_subscription(self):
@@ -23,6 +23,16 @@ class BindingsTests(ChannelTestCase):
         self.assertEqual(received['payload']['action'], GameBinding.JOIN_SUB)
         self.assertEqual(received['payload']['pk'], game.pk)
         self.assertEqual(received['payload']['data']['user']['username'], user.username)
+
+        user2 = User.objects.get(username='free_user2')
+        game.join(user2)
+
+        received = client.receive()
+        self.assertIsNotNone(received)
+        self.assertEqual(received['stream'], GameBinding.stream)
+        self.assertEqual(received['payload']['action'], GameBinding.JOIN_SUB)
+        self.assertEqual(received['payload']['pk'], game.pk)
+        self.assertEqual(received['payload']['data']['user']['username'], user2.username)
 
     def test_next_question_subscription(self):
         game = Game.objects.first()

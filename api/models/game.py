@@ -119,6 +119,7 @@ class Game(models.Model):
         )
         player.user.rating += points
         if not created:
+            player_answer.answer = answer
             player_answer.correct = correct
             player.user.rating -= player_answer.points
             player_answer.points = points

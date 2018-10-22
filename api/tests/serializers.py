@@ -5,7 +5,7 @@ from api.serializers.game import AnswerSerializer
 from api.tests import ALL_FIXTURES
 
 
-class SerializersTests(TestCase):
+class AnswerSerializerTest(TestCase):
     fixtures = ALL_FIXTURES
 
     def test_answer_serializer(self):
