@@ -199,6 +199,9 @@ class Player(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     finished_at = models.DateTimeField(null=True, db_index=True)
 
+    class Meta:
+        unique_together = ('user', 'game')
+
 
 class Answer(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE)

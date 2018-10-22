@@ -8,7 +8,7 @@ class GameModelTest(TestCase):
     fixtures = ALL_FIXTURES
 
     def test_join(self):
-        game = Game.objects.first()
+        game = Game.objects.get(label='new_game')
         user1 = User.objects.get(username='free_user')
 
         player = game.join(user1)
@@ -18,6 +18,7 @@ class GameModelTest(TestCase):
         user2 = User.objects.get(username='free_user2')
 
         player = game.join(user2)
+        self.assertEqual(game.players.count(), 2)
         self.assertEqual(player.user, user2)
         self.assertEqual(player.game, game)
 

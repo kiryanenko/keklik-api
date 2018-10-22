@@ -38,10 +38,10 @@
     "pk": 3,
     "fields": {
       "quiz": 1,
-      "label": "string",
+      "label": "new_game",
       "online": true,
       "user": 1,
-      "state": "",
+      "state": "players_waiting",
       "current_question": null,
       "timer_on": true,
       "created_at": "2018-10-15T14:18:17.041Z",
