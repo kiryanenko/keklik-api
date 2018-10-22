@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError, PermissionDenied
 from rest_framework.fields import empty
 
-from api.models import Game, GeneratedQuestion, Question, Player, Answer
+from api.models import Game, GeneratedQuestion, Question, Player, Answer, Variant
 from api.serializers.quiz import QuizSerializer, VariantSerializer
 from api.serializers.user import UserSerializer
 
@@ -58,6 +58,13 @@ class AnswerSerializer(serializers.ModelSerializer):
             raise ValidationError(detail='Be late.', code='be_late')
 
         return value
+
+    # FIXME: invalid docs
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        ret['answer'] = list(map(lambda var_id: VariantSerializer(Variant.objects.get(id=var_id)).data,
+                                 instance.answer))
+        return ret
 
 
 class GeneratedQuestionSerializer(serializers.ModelSerializer):

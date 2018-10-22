@@ -83,4 +83,4 @@ class BindingsTests(ChannelTestCase):
         self.assertEqual(received['stream'], GameBinding.stream)
         self.assertEqual(received['payload']['action'], GameBinding.ANSWER_SUB)
         self.assertEqual(received['payload']['pk'], game.pk)
-        self.assertEqual(received['payload']['data']['answer'], answer)
+        self.assertEqual(received['payload']['data']['answer'][0]['id'], answer[0])
