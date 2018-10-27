@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-stdout=logs/keklik_api.log
-stderr=logs/keklik_api_err.log
+stdout=logs/deploy.log
+stderr=logs/deploy.log
 
 pkill daphne
 pkill python
 
-pip3 install -r requirements.txt
-python3 manage.py migrate
-python3 manage.py collectstatic -c --no-input
+pip3 install -r requirements.txt > ${stdout} 2> ${stderr}
+python3 manage.py migrate >> ${stdout} 2>> ${stderr}
+python3 manage.py collectstatic -c --no-input >> ${stdout} 2>> ${stderr}
 
 ./start.sh
