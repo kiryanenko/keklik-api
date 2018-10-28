@@ -57,6 +57,8 @@ class Game(models.Model):
     answered = Signal(providing_args=['answer'])
     finished = Signal()
 
+    CAN_JOIN_TO_GOING_GAME = True
+
     @property
     def timer(self):
         if self.current_question is None:
@@ -69,7 +71,7 @@ class Game(models.Model):
         return timezone.now() - self.state_changed_at - timer
 
     def join(self, user):
-        if self.state != self.PLAYERS_WAITING_STATE:
+        if not self.CAN_JOIN_TO_GOING_GAME and self.state != self.PLAYERS_WAITING_STATE:
             raise ValidationError(detail='Game state is not "players_waiting".', code='not_players_waiting')
 
         player, created = Player.objects.get_or_create(game=self, user=user)
