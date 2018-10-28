@@ -2,7 +2,9 @@ import random
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.dispatch import Signal
+from django.db.models import Sum
+from django.db.models.signals import post_save
+from django.dispatch import Signal, receiver
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 
@@ -70,6 +72,20 @@ class Game(models.Model):
 
         return timezone.now() - self.state_changed_at - timer
 
+    def finish(self):
+        now = timezone.now()
+
+        self.current_question = None
+        self.state = self.FINISH_STATE
+        self.state_changed_at = now
+
+        for player in self.players.all():
+            player.finish()
+
+        self.save()
+
+        self.finished.send(self)
+
     def join(self, user):
         if not self.CAN_JOIN_TO_GOING_GAME and self.state != self.PLAYERS_WAITING_STATE:
             raise ValidationError(detail='Game state is not "players_waiting".', code='not_players_waiting')
@@ -82,7 +98,7 @@ class Game(models.Model):
 
     def next_question(self):
         if self.state == self.FINISH_STATE:
-            return self.current_question
+            return self.current_question    # None
 
         now = timezone.now()
 
@@ -99,11 +115,7 @@ class Game(models.Model):
             self.question_changed.send(self)
 
         except GeneratedQuestion.DoesNotExist:
-            self.current_question = None
-            self.state = self.FINISH_STATE
-            self.state_changed_at = now
-            self.save()
-            self.finished.send(self)
+            self.finish()
 
         return self.current_question
 
@@ -114,24 +126,20 @@ class Game(models.Model):
         correct = question.answer == answer
         points = self.count_points(question, correct)
 
-        player_answer, created = Answer.objects.get_or_create(
+        player_answer, created = Answer.objects.update_or_create(
             question=question,
             player=player,
             defaults={'answer': answer, 'correct': correct, 'points': points}
         )
-        player.user.rating += points
-        if not created:
-            player_answer.answer = answer
-            player_answer.correct = correct
-            player.user.rating -= player_answer.points
-            player_answer.points = points
-            player_answer.save()
-            player.user.save()
 
         self.save()
 
         self.answered.send(self, answer=player_answer)
         return player_answer
+
+    @property
+    def players_rating(self):
+        return self.players.order_by('-rating')
 
     @staticmethod
     def count_points(generated_question, correct=True):
@@ -198,11 +206,16 @@ class GeneratedQuestion(models.Model):
 class Player(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='players')
+    rating = models.IntegerField(default=0, help_text='Рейтинг за игру.')
     created_at = models.DateTimeField(auto_now_add=True)
     finished_at = models.DateTimeField(null=True, db_index=True)
 
     class Meta:
         unique_together = ('user', 'game')
+
+    def finish(self):
+        self.finished_at = timezone.now()
+        self.save()
 
 
 class Answer(models.Model):
@@ -216,3 +229,16 @@ class Answer(models.Model):
     correct = models.BooleanField(default=False)
     points = models.IntegerField(default=0, help_text='Начисленные очки за ответ.')
     answered_at = models.DateTimeField(auto_now=True)
+
+
+@receiver(post_save, sender=Answer)
+def update_rating(instance, **kwargs):
+    player = instance.player
+    user = player.user
+
+    rating_before = player.rating
+    player.rating = Answer.objects.filter(player=player).aggregate(Sum('points'))['points__sum']
+    user.rating += player.rating - rating_before
+
+    player.save()
+    user.save()

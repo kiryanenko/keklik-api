@@ -12,8 +12,8 @@ class PlayerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Player
-        fields = ('id', 'user', 'created_at', 'finished_at')
-        read_only_fields = ('created_at', 'finished_at')
+        fields = ('id', 'user', 'rating', 'created_at', 'finished_at')
+        read_only_fields = ('rating', 'created_at', 'finished_at')
 
 
 class AnswerSerializer(serializers.ModelSerializer):
