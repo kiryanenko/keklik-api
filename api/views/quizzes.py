@@ -1,4 +1,5 @@
 from rest_framework import permissions, filters
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import ListAPIView, get_object_or_404
 from rest_framework.viewsets import ModelViewSet
 
@@ -17,6 +18,14 @@ class QuizViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    def update(self, request, *args, **kwargs):
+        quiz = self.get_object()
+
+        if request.user != quiz.user:
+            raise PermissionDenied()
+
+        return super().update(request, *args, **kwargs)
 
 
 class UserQuizzesView(ListAPIView):
