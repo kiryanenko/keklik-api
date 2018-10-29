@@ -65,6 +65,26 @@ class GameViewSet(mixins.CreateModelMixin,
         serializer = self.get_serializer(games, many=True)
         return Response(serializer.data)
 
+    @action(detail=False, permission_classes=(permissions.IsAuthenticated,))
+    def current_player(self, request, *args, **kwarg):
+        """ Игры текущего игрока. """
+        games = self.get_player_games(request.user)
+        serializer = self.get_serializer(games, many=True)
+        return Response(serializer.data)
+
+    @action(
+        detail=False,
+        permission_classes=(permissions.IsAuthenticated,),
+        url_path='current_player/running'
+    )
+    def current_player_running(self, request, *args, **kwarg):
+        """ Незавершенные игры текущего игрока. """
+        games = self.get_player_games(request.user).exclude(state=Game.FINISH_STATE)
+        serializer = self.get_serializer(games, many=True)
+        return Response(serializer.data)
+
     def get_user_games(self, user):
         return self.filter_queryset(self.get_queryset().filter(user=user))
 
+    def get_player_games(self, user):
+        return self.filter_queryset(self.get_queryset().filter(players__user=user))
