@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, filters
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import ListAPIView, get_object_or_404
@@ -32,7 +33,7 @@ class UserQuizzesView(ListAPIView):
     serializer_class = QuizSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
-    filter_backends = (filters.OrderingFilter,)
+    filter_backends = (filters.OrderingFilter, DjangoFilterBackend)
     ordering_fields = ('id', 'version_date', 'title', 'rating')
     ordering = ('-rating', '-version_date', '-id')
 

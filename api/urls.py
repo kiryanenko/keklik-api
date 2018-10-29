@@ -17,5 +17,6 @@ urlpatterns = [
     url(r'^users/me/password/$', PasswordView.as_view()),
     url(r'^users/me/quizzes/$', CurrentUserQuizzesView.as_view()),
     url(r'^users/(?P<username>\w+)/quizzes/$', UserQuizzesView.as_view()),
+    url(r'^quizzes/my/$', CurrentUserQuizzesView.as_view()),
     url(r'^', include(router.urls)),
 ]

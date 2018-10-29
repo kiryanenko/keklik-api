@@ -44,9 +44,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'django_filters',
     'channels',
     'channels_api',
     'corsheaders',
+    'crispy_forms',
     'drf_yasg',
     'api'
 ]
@@ -118,7 +120,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ),
-    'EXCEPTION_HANDLER': 'api.utils.errors.api_exception_handler'
+    'EXCEPTION_HANDLER': 'api.utils.errors.api_exception_handler',
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',)
 }
 
 # Internationalization

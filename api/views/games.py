@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import mixins, permissions, filters, status
 from rest_framework.decorators import action
@@ -17,7 +18,8 @@ class GameViewSet(mixins.CreateModelMixin,
     serializer_class = GameSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
-    filter_backends = (filters.OrderingFilter,)
+    filter_backends = (filters.OrderingFilter, DjangoFilterBackend)
+    filter_fields = ('state',)
     ordering_fields = ('id', 'created_at', 'title')
     ordering = ('-created_at', '-id')
 
@@ -44,3 +46,25 @@ class GameViewSet(mixins.CreateModelMixin,
     def rating(self, request, *args, **kwargs):
         game = self.get_object()
         return Response(PlayerSerializer(game.players_rating, many=True).data)
+
+    @action(detail=False, permission_classes=(permissions.IsAuthenticated,))
+    def my(self, request, *args, **kwargs):
+        """ Созданные игры текущим пользователем (учителем). """
+        games = self.get_user_games(request.user)
+        serializer = self.get_serializer(games, many=True)
+        return Response(serializer.data)
+
+    @action(
+        detail=False,
+        permission_classes=(permissions.IsAuthenticated,),
+        url_path='my/running'
+    )
+    def my_running(self, request, *args, **kwargs):
+        """ Запущенные игры текущим пользователем (учителем). """
+        games = self.get_user_games(request.user).exclude(state=Game.FINISH_STATE)
+        serializer = self.get_serializer(games, many=True)
+        return Response(serializer.data)
+
+    def get_user_games(self, user):
+        return self.filter_queryset(self.get_queryset().filter(user=user))
+

@@ -1,5 +1,7 @@
 Django==2.1.1
 djangorestframework==3.8.2
+django-filter
+django-crispy-forms
 django-cors-headers
 channels==1.1.8
 channels_api
