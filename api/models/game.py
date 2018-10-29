@@ -139,7 +139,7 @@ class Game(models.Model):
 
     @property
     def players_rating(self):
-        return self.players.order_by('-rating')
+        return self.players.order_by('-rating', 'id')
 
     @staticmethod
     def count_points(generated_question, correct=True):
