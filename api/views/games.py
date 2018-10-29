@@ -54,6 +54,7 @@ class GameViewSet(mixins.CreateModelMixin,
         serializer = self.get_serializer(games, many=True)
         return Response(serializer.data)
 
+    @swagger_auto_schema(operation_id='my_running_games')
     @action(
         detail=False,
         permission_classes=(permissions.IsAuthenticated,),
@@ -72,10 +73,11 @@ class GameViewSet(mixins.CreateModelMixin,
         serializer = self.get_serializer(games, many=True)
         return Response(serializer.data)
 
+    @swagger_auto_schema(operation_id='current_player_running_games')
     @action(
         detail=False,
         permission_classes=(permissions.IsAuthenticated,),
-        url_path='current_player/running'
+        url_path='current_player/running',
     )
     def current_player_running(self, request, *args, **kwarg):
         """ Незавершенные игры текущего игрока. """
