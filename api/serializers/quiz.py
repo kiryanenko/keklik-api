@@ -30,6 +30,13 @@ class QuestionSerializer(serializers.ModelSerializer):
 
         return attrs
 
+    def validate_variants(self, value):
+        variant_set = set(map(lambda var: var['variant'], value))
+        if len(value) > len(variant_set):
+            raise ValidationError(detail='Variants should be unique per a question.', code='unique')
+
+        return value
+
 
 class QuizSerializer(serializers.ModelSerializer):
     tags = CreatableSlugRelatedField(many=True, queryset=Tag.objects.all(), slug_field='tag')
