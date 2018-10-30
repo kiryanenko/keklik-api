@@ -38,6 +38,7 @@ urlpatterns = [
     url(r'^auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include('api.urls')),
+    url(r'^api/', include('organization.urls')),
     url(r'^api/channels/', include('channels_api.urls')),
     url(r'^docs/', schema_view.with_ui('swagger', cache_timeout=0)),
     url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),

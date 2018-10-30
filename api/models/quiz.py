@@ -1,12 +1,13 @@
 from datetime import datetime
 
 from django.contrib.postgres.fields import ArrayField
-from django.db import models
+from django.db import models, transaction
 
 from api.models import User
 
 
 class QuizManager(models.Manager):
+    @transaction.atomic
     def create_quiz(self, questions=None, tags=None, **kwargs):
         quiz = self.create(**kwargs)
 
@@ -31,6 +32,7 @@ class Quiz(models.Model):
 
     objects = QuizManager()
 
+    @transaction.atomic
     def update(self, title=None, description=None,  questions=None, tags=None):
         if title is description is questions is tags is None:
             return self

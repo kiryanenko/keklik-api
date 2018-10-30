@@ -1,7 +1,7 @@
 import random
 
 from django.contrib.postgres.fields import ArrayField
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Sum
 from django.db.models.signals import post_save
 from django.dispatch import Signal, receiver
@@ -12,6 +12,7 @@ from api.models import Quiz, User, Question
 
 
 class GameManager(models.Manager):
+    @transaction.atomic
     def new_game(self, quiz, user, label='', online=False):
         game = self.create(quiz=quiz, label=label, online=online, user=user)
 

@@ -50,7 +50,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'crispy_forms',
     'drf_yasg',
-    'api'
+    'api',
+    'organization'
 ]
 
 MIDDLEWARE = [
