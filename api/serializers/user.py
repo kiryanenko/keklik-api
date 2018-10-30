@@ -70,3 +70,18 @@ class ChangePasswordSerializer(serializers.Serializer):
         if not self.instance.check_password(value):
             raise ValidationError('Incorrect old password')
         return value
+
+
+class GetUserSerializer(serializers.Serializer):
+    username = serializers.CharField()
+
+    def validate_username(self, value):
+        try:
+            self.user = User.objects.get(username=value)
+        except User.DoesNotExist:
+            raise ValidationError('User not found.', code='not_found')
+
+        return value
+
+    def save(self, **kwargs):
+        return self.user

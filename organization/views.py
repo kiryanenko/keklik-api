@@ -6,7 +6,8 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from api.utils.views import status_text
 from organization.models import Organization, Group
-from organization.serializers import OrganizationSerializer, GroupSerializer
+from organization.serializers import OrganizationSerializer, GroupSerializer, AdminSerializer, AddAdminSerializer, \
+    DeleteAdminSerializer
 
 
 class IsOrganizationAdminOrReadOnly(permissions.BasePermission):
@@ -22,6 +23,44 @@ class OrganizationViewSet(ModelViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOrganizationAdminOrReadOnly)
+
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: AdminSerializer(many=True),
+            status.HTTP_404_NOT_FOUND: 'Organization not found.'
+        }
+    )
+    @action(detail=True)
+    def admins(self, *args, **kwargs):
+        """ Список админов организации. """
+        organization = self.get_object()
+        admins = organization.admins.all().order_by('id')
+        return Response(AdminSerializer(admins, many=True).data)
+
+    @swagger_auto_schema(
+        request_body=AddAdminSerializer,
+        responses={
+            status.HTTP_201_CREATED: AdminSerializer,
+            status.HTTP_403_FORBIDDEN: status_text(status.HTTP_403_FORBIDDEN),
+            status.HTTP_404_NOT_FOUND: 'Organization not found.'
+        }
+    )
+    @admins.mapping.post
+    def add_admin(self, request, *args, **kwargs):
+        """ Добавление админа к организации. """
+        serializer = AddAdminSerializer(data=request.data, context={'organization': self.get_object()})
+        serializer.is_valid(raise_exception=True)
+        admin = serializer.save()
+        return Response(AdminSerializer(admin).data, status=status.HTTP_201_CREATED)
+
+    @swagger_auto_schema(request_body=DeleteAdminSerializer)
+    @admins.mapping.delete
+    def delete_admin(self, request, *args, **kwargs):
+        """ Удаление админа из организации. """
+        serializer = DeleteAdminSerializer(data=request.data, context={'organization': self.get_object()})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @swagger_auto_schema(
         responses={
