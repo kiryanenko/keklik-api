@@ -1,17 +1,17 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, filters
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import ListAPIView, get_object_or_404
 from rest_framework.viewsets import ModelViewSet
 
 from api.models import Quiz, User
 from api.serializers.quiz import QuizSerializer
+from api.utils.views import IsOwnerOrReadOnly
 
 
 class QuizViewSet(ModelViewSet):
     queryset = Quiz.objects.filter(old_version__isnull=True)
     serializer_class = QuizSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
 
     filter_backends = (filters.OrderingFilter,)
     ordering_fields = ('id', 'version_date', 'title', 'rating')
@@ -19,14 +19,6 @@ class QuizViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
-    def update(self, request, *args, **kwargs):
-        quiz = self.get_object()
-
-        if request.user != quiz.user:
-            raise PermissionDenied()
-
-        return super().update(request, *args, **kwargs)
 
 
 class UserQuizzesView(ListAPIView):
