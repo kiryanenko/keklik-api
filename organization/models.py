@@ -36,7 +36,7 @@ class Group(models.Model):
 
 
 class GroupMember(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='member_of_groups')
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='members')
     created_at = models.DateTimeField(auto_now_add=True)
 

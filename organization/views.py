@@ -8,7 +8,7 @@ from api.models import Game
 from api.serializers.game import GameSerializer
 from api.utils.views import status_text
 from organization.models import Organization, Group
-from organization.serializers import OrganizationSerializer, GroupSerializer, AdminSerializer, AddAdminSerializer, \
+from organization.serializers import OrganizationDetailSerializer, GroupSerializer, AdminSerializer, AddAdminSerializer, \
     DeleteAdminSerializer, GroupMemberSerializer
 
 
@@ -23,7 +23,7 @@ class IsOrganizationAdminOrReadOnly(permissions.BasePermission):
 
 class OrganizationViewSet(ModelViewSet):
     queryset = Organization.objects.all()
-    serializer_class = OrganizationSerializer
+    serializer_class = OrganizationDetailSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOrganizationAdminOrReadOnly)
 
     @swagger_auto_schema(

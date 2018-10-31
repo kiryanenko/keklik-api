@@ -77,7 +77,7 @@ class AdminSerializer(serializers.ModelSerializer):
         fields = ('user', 'created_at')
 
 
-class OrganizationSerializer(serializers.ModelSerializer):
+class OrganizationDetailSerializer(serializers.ModelSerializer):
     admins = AdminSerializer(many=True, read_only=True)
     groups = GroupSerializer(many=True, read_only=True)
 
@@ -88,3 +88,30 @@ class OrganizationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return Organization.objects.create_organization(validated_data.get('name'), self.context['request'].user)
+
+
+class OrganizationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Organization
+        fields = ('id', 'name', 'created_at', 'updated_at')
+        read_only_fields = ('created_at', 'updated_at')
+
+
+class OrganisationGroupSerializer(serializers.ModelSerializer):
+    organization = OrganizationSerializer()
+
+    class Meta:
+        model = Group
+        fields = ('id', 'name', 'organization', 'created_at', 'updated_at')
+        read_only_fields = ('organization', 'created_at', 'updated_at')
+
+    def create(self, validated_data):
+        return Group.objects.create(organization=self.context['organization'], **validated_data)
+
+
+class MemberOfGroupSerializer(serializers.ModelSerializer):
+    group = OrganisationGroupSerializer()
+
+    class Meta:
+        model = GroupMember
+        fields = ('group', 'role', 'created_at')

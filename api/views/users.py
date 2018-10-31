@@ -8,7 +8,9 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from api.models import User
-from api.serializers.user import CredentialsSerializer, UserSerializer, ChangePasswordSerializer
+from api.serializers.credentials import CredentialsSerializer, ChangePasswordSerializer
+from api.serializers.user import UserSerializer
+from api.serializers.user_detail import UserDetailSerializer
 from api.utils.views import status_text
 
 
@@ -66,12 +68,12 @@ class CurrentUserView(GenericAPIView):
         operation_id='current_profile',
         operation_summary='Профиль текущего юзера',
         responses={
-            status.HTTP_200_OK: UserSerializer,
+            status.HTTP_200_OK: UserDetailSerializer,
             status.HTTP_403_FORBIDDEN: status_text(status.HTTP_403_FORBIDDEN)
         }
     )
     def get(self, request):
-        serializer = UserSerializer(request.user)
+        serializer = UserDetailSerializer(request.user)
         return Response(serializer.data)
 
     @swagger_auto_schema(
