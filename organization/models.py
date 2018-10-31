@@ -47,4 +47,4 @@ class GroupMember(models.Model):
     role = models.CharField(max_length=100, choices=ROLE_CHOICES)
 
     class Meta:
-        unique_together = ('group', 'user')
+        unique_together = ('group', 'user', 'role')

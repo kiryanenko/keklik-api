@@ -9,12 +9,13 @@ from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 
 from api.models import Quiz, User, Question
+from organization.models import Group
 
 
 class GameManager(models.Manager):
     @transaction.atomic
-    def new_game(self, quiz, user, label='', online=False):
-        game = self.create(quiz=quiz, label=label, online=online, user=user)
+    def new_game(self, quiz, user, label='', online=False, group=None):
+        game = self.create(quiz=quiz, label=label, online=online, user=user, group=group)
 
         for question in quiz.questions.all():
             GeneratedQuestion.objects.generate(game, question)
@@ -27,6 +28,7 @@ class Game(models.Model):
     label = models.CharField(max_length=300, blank=True)
     online = models.BooleanField(default=True, db_index=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, related_name='games')
     base_game = models.ForeignKey('Game', on_delete=models.CASCADE, null=True)
 
     PLAYERS_WAITING_STATE = 'players_waiting'

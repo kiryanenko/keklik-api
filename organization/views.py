@@ -4,6 +4,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
+from api.models import Game
+from api.serializers.game import GameSerializer
 from api.utils.views import status_text
 from organization.models import Organization, Group
 from organization.serializers import OrganizationSerializer, GroupSerializer, AdminSerializer, AddAdminSerializer, \
@@ -129,3 +131,29 @@ class GroupViewSet(mixins.RetrieveModelMixin,
         serializer.is_valid(raise_exception=True)
         member = serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: GameSerializer(many=True),
+            status.HTTP_404_NOT_FOUND: 'Group not found.'
+        }
+    )
+    @action(detail=True)
+    def games(self, *args, **kwarg):
+        """ История проведенных игр опубликованные в этой группе. """
+        group = self.get_object()
+        games = group.games.all().order_by('-id')
+        return Response(GameSerializer(games, many=True).data)
+
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: GameSerializer(many=True),
+            status.HTTP_404_NOT_FOUND: 'Group not found.'
+        }
+    )
+    @action(detail=True, url_path='games/running')
+    def running_games(self, *args, **kwarg):
+        """ Запущенные игры в этой группе. """
+        group = self.get_object()
+        games = group.games.exclude(state=Game.FINISH_STATE).order_by('-id')
+        return Response(GameSerializer(games, many=True).data)
