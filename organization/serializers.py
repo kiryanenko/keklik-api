@@ -3,14 +3,35 @@ from rest_framework.exceptions import ValidationError
 
 from api.models import User
 from api.serializers.user import UserSerializer, GetUserSerializer
-from organization.models import Organization, Group, Admin
+from organization.models import Organization, Group, Admin, GroupMember
+
+
+class GroupMemberSerializer(serializers.ModelSerializer):
+    user = serializers.SlugRelatedField(slug_field='username', queryset=User.objects.all(), help_text='Username')
+
+    class Meta:
+        model = GroupMember
+        fields = ('user', 'role', 'created_at')
+        read_only_fields = ('created_at',)
+
+    def validate_user(self, value):
+        group = self.context['group']
+        if group.members.filter(user=value).exists():
+            raise ValidationError('User is already in this group.', code='exists')
+
+        return value
+
+    def create(self, validated_data):
+        return GroupMember.objects.create(group=self.context['group'], **validated_data)
 
 
 class GroupSerializer(serializers.ModelSerializer):
+    members = GroupMemberSerializer(many=True, read_only=True)
+
     class Meta:
         model = Group
-        fields = ('id', 'name', 'created_at', 'updated_at')
-        read_only_fields = ('created_at', 'updated_at')
+        fields = ('id', 'name', 'members', 'created_at', 'updated_at')
+        read_only_fields = ('members', 'created_at', 'updated_at')
 
     def create(self, validated_data):
         return Group.objects.create(organization=self.context['organization'], **validated_data)

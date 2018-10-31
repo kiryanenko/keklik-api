@@ -7,7 +7,7 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from api.utils.views import status_text
 from organization.models import Organization, Group
 from organization.serializers import OrganizationSerializer, GroupSerializer, AdminSerializer, AddAdminSerializer, \
-    DeleteAdminSerializer
+    DeleteAdminSerializer, GroupMemberSerializer
 
 
 class IsOrganizationAdminOrReadOnly(permissions.BasePermission):
@@ -41,6 +41,7 @@ class OrganizationViewSet(ModelViewSet):
         request_body=AddAdminSerializer,
         responses={
             status.HTTP_201_CREATED: AdminSerializer,
+            status.HTTP_400_BAD_REQUEST: status_text(status.HTTP_400_BAD_REQUEST),
             status.HTTP_403_FORBIDDEN: status_text(status.HTTP_403_FORBIDDEN),
             status.HTTP_404_NOT_FOUND: 'Organization not found.'
         }
@@ -100,3 +101,31 @@ class GroupViewSet(mixins.RetrieveModelMixin,
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOrganizationAdminOrReadOnly)
+
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: GroupMemberSerializer(many=True),
+            status.HTTP_404_NOT_FOUND: 'Group not found.'
+        }
+    )
+    @action(detail=True)
+    def members(self, request, *args, **kwargs):
+        """ Члены группы. """
+        group = self.get_object()
+        return Response(GroupMemberSerializer(group.members.all(), many=True).data)
+
+    @swagger_auto_schema(
+        request_body=GroupMemberSerializer,
+        responses={
+            status.HTTP_201_CREATED: GroupMemberSerializer,
+            status.HTTP_400_BAD_REQUEST: status_text(status.HTTP_400_BAD_REQUEST),
+            status.HTTP_404_NOT_FOUND: 'Group not found.'
+        }
+    )
+    @members.mapping.post
+    def add_member(self, request, *args, **kwargs):
+        """ Добавление пользователя к группе. """
+        serializer = GroupMemberSerializer(data=request.data, context={'group': self.get_object()})
+        serializer.is_valid(raise_exception=True)
+        member = serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
