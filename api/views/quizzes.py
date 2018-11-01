@@ -24,7 +24,7 @@ class QuizViewSet(ModelViewSet):
         serializer.save(user=self.request.user)
 
     @swagger_auto_schema(request_body=no_body)
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def copy(self, request, *args, **kwargs):
         """ Создать копию этой викторины у текущего юзера. """
         quiz = self.get_object()
