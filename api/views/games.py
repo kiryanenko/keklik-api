@@ -13,6 +13,7 @@ from api.utils.views import status_text
 class GameViewSet(mixins.CreateModelMixin,
                   mixins.RetrieveModelMixin,
                   mixins.ListModelMixin,
+                  mixins.DestroyModelMixin,
                   GenericViewSet):
     queryset = Game.objects.all()
     serializer_class = GameSerializer
