@@ -106,6 +106,9 @@ class Quiz(models.Model):
 
         return quiz_clone
 
+    def __str__(self):
+        return '[{}] {} - {}'.format(self.pk, self.title, self.version_date)
+
 
 class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')
@@ -136,6 +139,9 @@ class Question(models.Model):
         unique_together = ('quiz', 'number')
         ordering = ('quiz', 'number')
 
+    def __str__(self):
+        return '{}. {}'.format(self.number, self.question)
+
 
 class Variant(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='variants')
@@ -143,6 +149,9 @@ class Variant(models.Model):
 
     class Meta:
         unique_together = ('variant', 'question')
+
+    def __str__(self):
+        return self.variant
 
 
 class TagManager(models.Manager):
@@ -154,3 +163,6 @@ class Tag(models.Model):
     tag = models.CharField(max_length=50, unique=True, db_index=True)
 
     objects = TagManager()
+
+    def __str__(self):
+        return self.tag

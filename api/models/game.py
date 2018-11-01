@@ -155,6 +155,9 @@ class Game(models.Model):
             coefficient = 0
         return generated_question.question.points + generated_question.question.points * coefficient
 
+    def __str__(self):
+        return '[{}] {} {} {}'.format(self.pk, self.state, self.label, self.quiz)
+
 
 class GeneratedQuestionManager(models.Manager):
     def generate(self, game, question):
@@ -205,6 +208,9 @@ class GeneratedQuestion(models.Model):
     def variants(self):
         return list(map(lambda variant_id: self.question.variants.get(id=variant_id), self.variants_order))
 
+    def __str__(self):
+        return '[{}] {}'.format(self.pk, self.question)
+
 
 class Player(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -220,6 +226,9 @@ class Player(models.Model):
         self.finished_at = timezone.now()
         self.save()
 
+    def __str__(self):
+        return '[{}] {}'.format(self.pk, self.user)
+
 
 class Answer(models.Model):
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
@@ -232,6 +241,9 @@ class Answer(models.Model):
     correct = models.BooleanField(default=False)
     points = models.IntegerField(default=0, help_text='Начисленные очки за ответ.')
     answered_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return '{}. {} - {}'.format(self.question.number, self.player, self.answer)
 
 
 @receiver(post_save, sender=Answer)

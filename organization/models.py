@@ -18,6 +18,9 @@ class Organization(models.Model):
 
     objects = OrganizationManager()
 
+    def __str__(self):
+        return self.name
+
 
 class Admin(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -27,12 +30,18 @@ class Admin(models.Model):
     class Meta:
         unique_together = ('organization', 'user')
 
+    def __str__(self):
+        return str(self.user)
+
 
 class Group(models.Model):
     name = models.CharField(max_length=300)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='groups')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
 
 
 class GroupMember(models.Model):
@@ -52,3 +61,6 @@ class GroupMember(models.Model):
     @property
     def organization(self):
         return self.group.organization
+
+    def __str__(self):
+        return str(self.user)
