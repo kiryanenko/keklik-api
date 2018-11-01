@@ -75,6 +75,37 @@ class Quiz(models.Model):
         self.questions.all().delete()
         self.add_questions(*questions)
 
+    @transaction.atomic
+    def copy_to_user(self, user):
+        quiz_clone = Quiz.objects.get(pk=self.pk)
+        quiz_clone.pk = None
+        quiz_clone.user = user
+        quiz_clone.save()
+
+        quiz_clone.tags.add(*self.tags.all())
+
+        for question_src in self.questions.all():
+            question_clone = Question.objects.get(pk=question_src.pk)
+            question_clone.pk = None
+            question_clone.quiz = quiz_clone
+            question_clone.save()
+
+            answer_dict = {}
+
+            for variant_src in question_src.variants.all():
+                variant_clone = Variant.objects.get(pk=variant_src.pk)
+                variant_clone.pk = None
+                variant_clone.question = question_clone
+                variant_clone.save()
+
+                if variant_src.pk in question_src.answer:
+                    answer_dict[variant_src.pk] = variant_clone.pk
+
+            question_clone.answer = list(map(lambda ans_key: answer_dict[ans_key], question_src.answer))
+            question_clone.save()
+
+        return quiz_clone
+
 
 class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')

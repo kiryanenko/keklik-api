@@ -1,6 +1,9 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import permissions, filters
+from drf_yasg.utils import swagger_auto_schema, no_body
+from rest_framework import permissions, filters, status
+from rest_framework.decorators import action
 from rest_framework.generics import ListAPIView, get_object_or_404
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from api.models import Quiz, User
@@ -19,6 +22,15 @@ class QuizViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    @swagger_auto_schema(request_body=no_body)
+    @action(detail=True, methods=['post'])
+    def copy(self, request, *args, **kwargs):
+        """ Создать копию этой викторины у текущего юзера. """
+        quiz = self.get_object()
+        copy = quiz.copy_to_user(request.user)
+        serializer = self.get_serializer(copy)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class UserQuizzesView(ListAPIView):
