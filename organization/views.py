@@ -7,7 +7,7 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from api.models import Game
 from api.serializers.game import GameSerializer
 from api.utils.views import status_text
-from organization.models import Organization, Group
+from organization.models import Organization, Group, GroupMember
 from organization.serializers import OrganizationDetailSerializer, GroupSerializer, AdminSerializer, AddAdminSerializer, \
     DeleteAdminSerializer, GroupMemberSerializer
 
@@ -157,3 +157,11 @@ class GroupViewSet(mixins.RetrieveModelMixin,
         group = self.get_object()
         games = group.games.exclude(state=Game.FINISH_STATE).order_by('-id')
         return Response(GameSerializer(games, many=True).data)
+
+
+class GroupMemberViewSet(mixins.RetrieveModelMixin,
+                         mixins.DestroyModelMixin,
+                         GenericViewSet):
+    queryset = GroupMember.objects.all()
+    serializer_class = GroupMemberSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOrganizationAdminOrReadOnly)

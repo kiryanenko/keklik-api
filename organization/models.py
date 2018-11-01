@@ -22,7 +22,7 @@ class Organization(models.Model):
 class Admin(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='admins')
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ('organization', 'user')
@@ -38,7 +38,7 @@ class Group(models.Model):
 class GroupMember(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='member_of_groups')
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='members')
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now=True)
 
     ROLE_CHOICES = (
         ('student', 'Student'),
@@ -48,3 +48,7 @@ class GroupMember(models.Model):
 
     class Meta:
         unique_together = ('group', 'user', 'role')
+
+    @property
+    def organization(self):
+        return self.group.organization

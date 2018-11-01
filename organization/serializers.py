@@ -11,7 +11,7 @@ class GroupMemberSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GroupMember
-        fields = ('user', 'role', 'created_at')
+        fields = ('id', 'user', 'role', 'created_at')
         read_only_fields = ('created_at',)
 
     def validate_user(self, value):
