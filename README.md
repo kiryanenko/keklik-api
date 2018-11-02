@@ -123,6 +123,52 @@
 ```
 
 
+### Сменить состояние на проверку ответов `check`
+
+**Запрос:**
+
+```json
+{
+  "stream": "games",
+  "payload": {
+    "action": "check",
+    "pk": 1,
+    "request_id": "Идентификатор запроса (не обязательно)"
+  }
+}
+```
+
+**Ответ:**
+
+```json
+{
+  "stream": "games",
+  "payload": {
+    "errors": [], 
+    "data": {
+      "id": 6,
+      "question": "string",
+      "number": 1,
+      "type": "single",
+      "variants": [
+        {
+          "id": 32,
+          "variant": "string"
+        }
+      ],
+      "answer": [32],
+      "players_answers": [],
+      "timer": "00:00:00",
+      "points": 10
+    }, 
+    "action": "check", 
+    "response_status": 200, 
+    "request_id": "Идентификатор запроса"
+  }
+}
+```
+
+
 ## Подписки
 
 ### Обновление снапшота игры `update`
@@ -227,6 +273,54 @@
   }
 }
 ```
+
+
+### Состояние проверки ответа `check`
+
+**Запрос:**
+
+```json
+{
+  "stream": "games",
+  "payload": {
+    "action": "subscribe",
+    "pk": 1,
+    "data": {
+      "action": "check"
+    }
+  }
+}
+```
+
+**Рассылка:**
+
+```json
+{
+  "stream": "games", 
+  "payload": {
+    "action": "next_question", 
+    "pk": 1, 
+    "data": {
+      "id": 6,
+      "question": "string",
+      "number": 1,
+      "type": "single",
+      "variants": [
+        {
+          "id": 32,
+          "variant": "string"
+        }
+      ],
+      "answer": [32],
+      "players_answers": [],
+      "timer": "00:00:00",
+      "points": 10
+    }, 
+    "model": "api.generated_question"
+  }
+}
+```
+
 
 ### Завершение игры `finish`
 

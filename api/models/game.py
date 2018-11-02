@@ -60,6 +60,7 @@ class Game(models.Model):
     joined_player = Signal(providing_args=['player'])
     question_changed = Signal()
     answered = Signal(providing_args=['answer'])
+    check_signal = Signal(providing_args=['question'])
     finished = Signal()
 
     CAN_JOIN_TO_GOING_GAME = True
@@ -139,6 +140,17 @@ class Game(models.Model):
 
         self.answered.send(self, answer=player_answer)
         return player_answer
+
+    def check_state(self):
+        if self.state != self.ANSWERING_STATE:
+            raise ValidationError('Now not answering state', code='not_answering')
+
+        self.state = self.CHECK_STATE
+        self.save()
+
+        self.check_signal.send(self, question=self.current_question)
+
+        return self.current_question
 
     @property
     def players_rating(self):

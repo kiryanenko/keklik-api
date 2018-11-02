@@ -4,8 +4,8 @@ from channels_api.bindings import ReadOnlyResourceBinding
 from django.dispatch import receiver
 from rest_framework.exceptions import PermissionDenied
 
-from api.models import Game, Player, Answer
-from api.serializers.game import GameSerializer, PlayerSerializer, AnswerSerializer
+from api.models import Game, Player, Answer, GeneratedQuestion
+from api.serializers.game import GameSerializer, PlayerSerializer, AnswerSerializer, GeneratedQuestionSerializer
 
 
 class GroupMixin(object):
@@ -36,6 +36,7 @@ class GameBinding(GroupMixin, mixins.SubscribeModelMixin, ReadOnlyResourceBindin
     JOIN_SUB = 'join'
     NEXT_QUESTION_SUB = 'next_question'
     ANSWER_SUB = 'answer'
+    CHECK_SUB = 'check'
     FINISH_SUB = 'finish'
 
     @detail_action()
@@ -62,6 +63,17 @@ class GameBinding(GroupMixin, mixins.SubscribeModelMixin, ReadOnlyResourceBindin
         answer = serializer.save()
         return serializer.data, 200
 
+    @detail_action()
+    def check(self, pk, data=None, **kwargs):
+        game = self.get_object_or_404(pk)
+
+        if game.user != self.user:
+            raise PermissionDenied()
+
+        question = game.check_state()
+
+        return GeneratedQuestionSerializer(question).data, 200
+
     @staticmethod
     @receiver(Game.joined_player)
     def join_sub(sender, player, **kwargs):
@@ -77,6 +89,12 @@ class GameBinding(GroupMixin, mixins.SubscribeModelMixin, ReadOnlyResourceBindin
     def answer_sub(sender, answer,**kwargs):
         GameBinding.broadcast(GameBinding.ANSWER_SUB, pk=sender.pk, data=AnswerSerializer(instance=answer).data,
                               model=Answer)
+
+    @staticmethod
+    @receiver(Game.check_signal)
+    def check_sub(sender, question, **kwargs):
+        GameBinding.broadcast(GameBinding.CHECK_SUB, pk=sender.pk, data=GeneratedQuestionSerializer(question).data,
+                              model=GeneratedQuestion)
 
     @staticmethod
     @receiver(Game.finished)
