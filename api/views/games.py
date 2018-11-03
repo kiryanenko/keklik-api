@@ -1,3 +1,6 @@
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django.views.generic.base import View
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import mixins, permissions, filters, status
@@ -91,3 +94,28 @@ class GameViewSet(mixins.CreateModelMixin,
 
     def get_player_games(self, user):
         return self.filter_queryset(self.get_queryset().filter(players__user=user))
+
+
+class MediaGameViewSet(GenericViewSet):
+    queryset = Game.objects.all()
+    serializer_class = GameSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: 'Game_1__2018-11-02_22-43.xlsx',
+            status.HTTP_404_NOT_FOUND: status_text(status.HTTP_404_NOT_FOUND)
+        }
+    )
+    @action(detail=True)
+    def report(self, *args, **kwargs):
+        game = self.get_object()
+        report = game.make_report()
+
+        response = HttpResponse(
+            report,
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = 'attachment; filename=%s' % game.report_filename
+
+        return response

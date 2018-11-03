@@ -2,7 +2,7 @@ from django.conf.urls import url
 from django.urls import include
 from rest_framework import routers
 
-from api.views.games import GameViewSet
+from api.views.games import GameViewSet, MediaGameViewSet
 from api.views.quizzes import QuizViewSet, UserQuizzesView, CurrentUserQuizzesView
 from api.views.users import UserViewSet, SessionView, CurrentUserView, PasswordView
 
@@ -19,4 +19,11 @@ urlpatterns = [
     url(r'^users/(?P<username>\w+)/quizzes/$', UserQuizzesView.as_view()),
     url(r'^quizzes/my/$', CurrentUserQuizzesView.as_view()),
     url(r'^', include(router.urls)),
+]
+
+media_router = routers.DefaultRouter()
+media_router.register(r'games', MediaGameViewSet)
+
+media_urlpatterns = [
+    url(r'^', include(media_router.urls)),
 ]

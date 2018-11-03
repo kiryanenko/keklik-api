@@ -1,5 +1,7 @@
+import io
 import random
 
+import xlsxwriter
 from django.contrib.postgres.fields import ArrayField
 from django.db import models, transaction
 from django.db.models import Sum
@@ -21,6 +23,10 @@ class GameManager(models.Manager):
             GeneratedQuestion.objects.generate(game, question)
 
         return game
+
+
+def report_path(instance, filename):
+    return 'reports/%Y/%m/%d/Game_{}_%Y-%m-%d_%H-%M.xlsx'.format(instance.pk)
 
 
 class Game(models.Model):
@@ -45,6 +51,9 @@ class Game(models.Model):
 
     current_question = models.ForeignKey('GeneratedQuestion', on_delete=models.CASCADE, null=True, related_name='+')
     timer_on = models.BooleanField(default=True, db_index=True)
+
+    # TODO: Saving report
+    # report = models.FileField(null=True, upload_to=report_path)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True, db_index=True,
@@ -151,6 +160,29 @@ class Game(models.Model):
         self.check_signal.send(self, question=self.current_question)
 
         return self.current_question
+
+    def make_report(self):
+        output = io.BytesIO()
+        report = xlsxwriter.Workbook(output)
+        worksheet = report.add_worksheet()
+
+        title = report.add_format({'font_size': 30, 'bold': True})
+        bold = report.add_format({'bold': True})
+
+        worksheet.write('A1', 'Отчет по проведенной виктоирне № {} за {}'.format(
+            self.pk, self.updated_at.strftime('%Y-%m-%d %H:%M')), title)
+        worksheet.write('A2', self.label)
+
+        worksheet.write('A3', 'Дата:', bold)
+        worksheet.write_datetime('B3', self.updated_at.now())
+
+        report.close()
+        output.seek(0)
+        return output
+
+    @property
+    def report_filename(self):
+        return 'Game_{}__{}.xlsx'.format(self.pk, self.updated_at.strftime('%Y-%m-%d_%H-%M'))
 
     @property
     def players_rating(self):

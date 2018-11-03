@@ -19,15 +19,46 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
+from api.urls import media_urlpatterns as api_media_urlpatterns
+
+api_urlpatterns = [
+    url(r'^', include('api.urls')),
+    url(r'^', include('organization.urls')),
+    url(r'^channels/', include('channels_api.urls'))
+]
+
 schema_view = get_schema_view(
     openapi.Info(
         title="Keklik API",
         default_version='v1',
-        description="Test description",
+        description="Keklik API.",
         terms_of_service="https://www.google.com/policies/terms/",
         contact=openapi.Contact(email="kiryanenkoav@gmail.com"),
         license=openapi.License(name="BSD License"),
+
     ),
+    patterns=api_urlpatterns,
+    validators=['flex', 'ssv'],
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
+
+
+media_urlpatterns = [
+    url(r'^', include(api_media_urlpatterns)),
+]
+
+media_schema_view = get_schema_view(
+    openapi.Info(
+        title="Keklik MEDIA",
+        default_version='v1',
+        description="Keklik media.",
+        terms_of_service="https://www.google.com/policies/terms/",
+        contact=openapi.Contact(email="kiryanenkoav@gmail.com"),
+        license=openapi.License(name="BSD License"),
+
+    ),
+    patterns=media_urlpatterns,
     validators=['flex', 'ssv'],
     public=True,
     permission_classes=(permissions.AllowAny,),
@@ -37,11 +68,11 @@ schema_view = get_schema_view(
 urlpatterns = [
     url(r'^auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^admin/', admin.site.urls),
-    url(r'^api/', include('api.urls')),
-    url(r'^api/', include('organization.urls')),
-    url(r'^api/channels/', include('channels_api.urls')),
-    url(r'^docs/', schema_view.with_ui('swagger', cache_timeout=0)),
-    url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-    url(r'^swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    url(r'^$', schema_view.with_ui('swagger', cache_timeout=0)),
+    url(r'^api/', include(api_urlpatterns)),
+    url(r'^media/$', media_schema_view.with_ui('swagger')),
+    url(r'^media/', include(media_urlpatterns)),
+    url(r'^docs/', schema_view.with_ui('swagger')),
+    url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(), name='schema-json'),
+    url(r'^swagger/', schema_view.with_ui('swagger'), name='schema-swagger-ui'),
+    url(r'^$', schema_view.with_ui('swagger')),
 ]

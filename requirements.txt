@@ -13,3 +13,4 @@ markdown
 drf-yasg
 flex
 swagger_spec_validator
+XlsxWriter
