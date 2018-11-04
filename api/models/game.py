@@ -207,11 +207,11 @@ class Game(models.Model):
         players_count = players.count()
         questions = self.generated_questions.order_by('question__number')
 
-        player_header_row = 4
+        player_header_row = 5
         question_total_row = player_header_row + players_count + 1
 
         self.report_questions(worksheet, styles, questions, 3, question_total_row)
-        self.report_players_answers(worksheet, styles, players, questions, 5)
+        self.report_players_answers(worksheet, styles, players, questions, player_header_row)
 
     def report_questions(self, worksheet, styles, questions, data_start_col, total_row):
         question_num_row = 0
@@ -228,7 +228,7 @@ class Game(models.Model):
         questions_count = questions.count()
         players_count = self.players.all().count()
 
-        success_answers_count_row = total_row + players_count
+        success_answers_count_row = total_row
         worksheet.write(success_answers_count_row, 0, 'Количество правильных ответов:', styles.bold)
         answers_count_row = success_answers_count_row + 1
         worksheet.write(answers_count_row, 0, 'Количество ответов:', styles.bold)
@@ -250,6 +250,8 @@ class Game(models.Model):
             success_answers_percent = success_answers_count / players_count
             worksheet.write_number(success_answers_percent_row, col, success_answers_percent)
 
+        worksheet.set_column(data_start_col, data_start_col + questions_count - 1, 20)
+
     def report_players_answers(self, worksheet, styles, players, questions, player_header_row):
         questions_count = questions.count()
 
@@ -259,12 +261,17 @@ class Game(models.Model):
         worksheet.write(player_header_row, login_col, 'Логин', styles.bold)
         name_col = 2
         worksheet.write(player_header_row, name_col, 'ФИО', styles.bold)
+        worksheet.set_column(name_col, name_col, 30)
         data_start_col = name_col + 1
 
         success_answers_count_col = data_start_col + questions_count
-        worksheet.write(player_header_row, success_answers_count_col, 'Количество правильных ответов', styles.bold)
+        worksheet.write(player_header_row, success_answers_count_col, 'Кол-во правильных ответов', styles.bold)
+        worksheet.set_column(success_answers_count_col, success_answers_count_col, 15)
+
         success_answers_percent_col = success_answers_count_col + 1
         worksheet.write(player_header_row, success_answers_percent_col, 'Процент правильных ответов', styles.bold)
+        worksheet.set_column(success_answers_percent_col, success_answers_percent_col, 15)
+
         rating_col = success_answers_percent_col + 1
         worksheet.write(player_header_row, rating_col, 'Рейтинг', styles.bold)
 
