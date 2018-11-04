@@ -10,7 +10,8 @@ from django.dispatch import Signal, receiver
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 
-from api.models import Quiz, User, Question
+from api.models import Quiz, User, Question, Variant
+from api.utils.xlsx import XslStyles
 from organization.models import Group
 
 
@@ -164,21 +165,131 @@ class Game(models.Model):
     def make_report(self):
         output = io.BytesIO()
         report = xlsxwriter.Workbook(output)
-        worksheet = report.add_worksheet()
+        styles = XslStyles(report)
 
-        title = report.add_format({'font_size': 30, 'bold': True})
-        bold = report.add_format({'bold': True})
-
-        worksheet.write('A1', 'Отчет по проведенной виктоирне № {} за {}'.format(
-            self.pk, self.updated_at.strftime('%Y-%m-%d %H:%M')), title)
-        worksheet.write('A2', self.label)
-
-        worksheet.write('A3', 'Дата:', bold)
-        worksheet.write_datetime('B3', self.updated_at.now())
+        self.report_main_page(report, styles)
+        self.report_answers_page(report, styles)
 
         report.close()
         output.seek(0)
         return output
+
+    def report_main_page(self, report, styles):
+        worksheet = report.add_worksheet('Общее')
+
+        worksheet.set_column('A:A', 30)
+
+        worksheet.write('A1', 'Отчет по проведенной викторине № {} за {}'.format(
+            self.pk, self.updated_at.strftime('%Y-%m-%d %H:%M')), styles.title)
+        worksheet.set_row(0, 30)
+        worksheet.write('A2', self.label)
+
+        worksheet.write('A3', 'Дата:', styles.bold)
+        worksheet.write_datetime('B3', self.updated_at.now())
+
+        worksheet.write('A4', 'Количество участников:', styles.bold)
+        players_count = self.players.all().count()
+        worksheet.write_number('B4', players_count)
+
+        worksheet.write('A5', 'Процент правильных ответов:', styles.bold)
+        success_answers_count = Answer.objects.filter(question__game=self, correct=True).count()
+        questions_count = self.generated_questions.all().count()
+        answers_count = players_count * questions_count
+        if answers_count == 0:
+            answers_count = 1
+        worksheet.write_number('B5', success_answers_count / answers_count)
+
+    def report_answers_page(self, report, styles):
+        worksheet = report.add_worksheet('Ответы участников')
+
+        players = self.players.all().order_by('user__last_name', 'user__first_name', 'user__patronymic',
+                                              'user__username')
+        players_count = players.count()
+        questions = self.generated_questions.order_by('question__number')
+
+        player_header_row = 4
+        question_total_row = player_header_row + players_count + 1
+
+        self.report_questions(worksheet, styles, questions, 3, question_total_row)
+        self.report_players_answers(worksheet, styles, players, questions, 5)
+
+    def report_questions(self, worksheet, styles, questions, data_start_col, total_row):
+        question_num_row = 0
+        worksheet.write(question_num_row, 0, '№ вопроса:', styles.bold)
+        question_text_row = 1
+        worksheet.write(question_text_row, 0, 'Вопрос:', styles.bold)
+        variants_row = 2
+        worksheet.write(variants_row, 0, 'Варианты:', styles.bold)
+        answer_row = 3
+        worksheet.write(answer_row, 0, 'Ответ:', styles.bold)
+        points_row = 4
+        worksheet.write(points_row, 0, 'Макс. балл за правильный ответ:', styles.bold)
+
+        questions_count = questions.count()
+        players_count = self.players.all().count()
+
+        success_answers_count_row = total_row + players_count
+        worksheet.write(success_answers_count_row, 0, 'Количество правильных ответов:', styles.bold)
+        answers_count_row = success_answers_count_row + 1
+        worksheet.write(answers_count_row, 0, 'Количество ответов:', styles.bold)
+        success_answers_percent_row = answers_count_row + 1
+        worksheet.write(success_answers_percent_row, 0, 'Процент правильных ответов:', styles.bold)
+
+        # Заполняю вопросы
+        for col, question in enumerate(questions, data_start_col):
+            worksheet.write_number(question_num_row, col, question.number, styles.bold)
+            worksheet.write_number(question_text_row, col, question.question.question)
+            worksheet.write_number(variants_row, col, question.variants_str)
+            worksheet.write_number(answer_row, col, question.question.answer_str)
+            worksheet.write_number(points_row, col, question.question.points)
+
+            success_answers_count = Answer.objects.filter(question=question, correct=True).count()
+            worksheet.write_number(success_answers_count_row, col, success_answers_count)
+            answers_count = Answer.objects.filter(question=question).count()
+            worksheet.write_number(answers_count_row, col, answers_count)
+            success_answers_percent = success_answers_count / players_count
+            worksheet.write_number(success_answers_percent_row, col, success_answers_percent)
+
+    def report_players_answers(self, worksheet, styles, players, questions, player_header_row):
+        questions_count = questions.count()
+
+        index_col = 0
+        worksheet.write(player_header_row, index_col, '№', styles.bold)
+        login_col = 1
+        worksheet.write(player_header_row, login_col, 'Логин', styles.bold)
+        name_col = 2
+        worksheet.write(player_header_row, name_col, 'ФИО', styles.bold)
+        data_start_col = name_col + 1
+
+        success_answers_count_col = data_start_col + questions_count
+        worksheet.write(player_header_row, success_answers_count_col, 'Количество правильных ответов', styles.bold)
+        success_answers_percent_col = success_answers_count_col + 1
+        worksheet.write(player_header_row, success_answers_percent_col, 'Процент правильных ответов', styles.bold)
+        rating_col = success_answers_percent_col + 1
+        worksheet.write(player_header_row, rating_col, 'Рейтинг', styles.bold)
+
+        # Заполняю ответы
+        row = player_header_row + 1
+        for i, player in enumerate(players, 1):
+            worksheet.write_number(row, index_col, i)
+            worksheet.write(row, login_col, player.user.username)
+            worksheet.write(row, name_col, player.user.full_name)
+
+            for col, question in enumerate(questions, data_start_col):
+                try:
+                    answer = Answer.objects.get(player=player, question=question)
+                    style = styles.bg_green if answer.correct else styles.bg_red
+                    worksheet.write(row, col, answer.answer_str, style)
+                except Answer.DoesNotExist:
+                    worksheet.write(row, col, '-', styles.bg_gray)
+
+            success_answers_count = Answer.objects.filter(player=player, correct=True).count()
+            worksheet.write_number(row, success_answers_count_col, success_answers_count)
+            success_answers_percent = success_answers_count / questions_count
+            worksheet.write_number(row, success_answers_percent_col, success_answers_percent)
+            worksheet.write_number(row, rating_col, player.rating)
+
+            row += 1
 
     @property
     def report_filename(self):
@@ -252,6 +363,11 @@ class GeneratedQuestion(models.Model):
     def variants(self):
         return list(map(lambda variant_id: self.question.variants.get(id=variant_id), self.variants_order))
 
+    @property
+    def variants_str(self):
+        variants = list(map(lambda variant: variant.variant, self.variants))
+        return '; '.join(variants)
+
     def __str__(self):
         return '[{}] {}'.format(self.pk, self.question)
 
@@ -285,6 +401,11 @@ class Answer(models.Model):
     correct = models.BooleanField(default=False)
     points = models.IntegerField(default=0, help_text='Начисленные очки за ответ.')
     answered_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def answer_str(self):
+        answer = list(map(lambda ans: Variant.objects.get(pk=ans).variant, self.answer))
+        return '; '.join(answer)
 
     def __str__(self):
         return '{}. {} - {}'.format(self.question.number, self.player, self.answer)

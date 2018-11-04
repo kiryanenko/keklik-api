@@ -1,6 +1,4 @@
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
-from django.views.generic.base import View
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import mixins, permissions, filters, status

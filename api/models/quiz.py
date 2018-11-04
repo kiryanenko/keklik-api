@@ -139,6 +139,11 @@ class Question(models.Model):
         unique_together = ('quiz', 'number')
         ordering = ('quiz', 'number')
 
+    @property
+    def answer_str(self):
+        answer = list(map(lambda ans: Variant.objects.get(pk=ans).variant, self.answer))
+        return '; '.join(answer)
+
     def __str__(self):
         return '{}. {}'.format(self.number, self.question)
 

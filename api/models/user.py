@@ -20,3 +20,7 @@ class User(AbstractUser):
     def token(self):
         token, created = Token.objects.get_or_create(user=self)
         return token.key
+
+    @property
+    def full_name(self):
+        return '{} {} {}'.format(self.last_name, self.first_name, self.patronymic)
