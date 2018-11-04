@@ -197,7 +197,7 @@ class Game(models.Model):
         answers_count = players_count * questions_count
         if answers_count == 0:
             answers_count = 1
-        worksheet.write_number('B5', success_answers_count / answers_count)
+        worksheet.write_number('B5', success_answers_count / answers_count * 100)
 
     def report_answers_page(self, report, styles):
         worksheet = report.add_worksheet('Ответы участников')
@@ -247,7 +247,7 @@ class Game(models.Model):
             worksheet.write_number(success_answers_count_row, col, success_answers_count)
             answers_count = Answer.objects.filter(question=question).count()
             worksheet.write_number(answers_count_row, col, answers_count)
-            success_answers_percent = success_answers_count / players_count
+            success_answers_percent = success_answers_count / players_count * 100
             worksheet.write_number(success_answers_percent_row, col, success_answers_percent)
 
         worksheet.set_column(data_start_col, data_start_col + questions_count - 1, 20)
@@ -292,7 +292,7 @@ class Game(models.Model):
 
             success_answers_count = Answer.objects.filter(player=player, correct=True).count()
             worksheet.write_number(row, success_answers_count_col, success_answers_count)
-            success_answers_percent = success_answers_count / questions_count
+            success_answers_percent = success_answers_count / questions_count * 100
             worksheet.write_number(row, success_answers_percent_col, success_answers_percent)
             worksheet.write_number(row, rating_col, player.rating)
 
