@@ -238,9 +238,9 @@ class Game(models.Model):
         # Заполняю вопросы
         for col, question in enumerate(questions, data_start_col):
             worksheet.write_number(question_num_row, col, question.number, styles.bold)
-            worksheet.write_number(question_text_row, col, question.question.question)
-            worksheet.write_number(variants_row, col, question.variants_str)
-            worksheet.write_number(answer_row, col, question.question.answer_str)
+            worksheet.write(question_text_row, col, question.question.question)
+            worksheet.write(variants_row, col, question.variants_str)
+            worksheet.write(answer_row, col, question.question.answer_str)
             worksheet.write_number(points_row, col, question.question.points)
 
             success_answers_count = Answer.objects.filter(question=question, correct=True).count()
