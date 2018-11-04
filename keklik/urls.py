@@ -37,7 +37,7 @@ schema_view = get_schema_view(
         license=openapi.License(name="BSD License"),
 
     ),
-    patterns=api_urlpatterns,
+    patterns=[url(r'^api/', include(api_urlpatterns))],
     validators=['flex', 'ssv'],
     public=True,
     permission_classes=(permissions.AllowAny,),
@@ -58,7 +58,7 @@ media_schema_view = get_schema_view(
         license=openapi.License(name="BSD License"),
 
     ),
-    patterns=media_urlpatterns,
+    patterns=[url(r'^media/', include(media_urlpatterns))],
     validators=['flex', 'ssv'],
     public=True,
     permission_classes=(permissions.AllowAny,),
