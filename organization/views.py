@@ -65,6 +65,12 @@ class OrganizationViewSet(ModelViewSet):
         serializer.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @action(detail=False, permission_classes=(permissions.IsAuthenticated,))
+    def admin_at(self, request, *args, **kwargs):
+        """ Список организаций, где текущий пользователь является админом. """
+        organizations = self.get_queryset().filter(admins__user=request.user)
+        return Response(self.get_serializer(organizations, many=True).data)
+
     @swagger_auto_schema(
         responses={
             status.HTTP_200_OK: GroupSerializer(many=True),
