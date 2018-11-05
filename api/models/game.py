@@ -23,6 +23,9 @@ class GameManager(models.Manager):
         for question in quiz.questions.all():
             GeneratedQuestion.objects.generate(game, question)
 
+        if group is not None:
+            group.organization.quizzes.add(quiz)
+
         return game
 
 

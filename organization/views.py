@@ -6,19 +6,33 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from api.models import Game
 from api.serializers.game import GameSerializer
+from api.serializers.quiz import QuizSerializer
 from api.utils.views import status_text
 from organization.models import Organization, Group, GroupMember
 from organization.serializers import OrganizationDetailSerializer, GroupSerializer, AdminSerializer, AddAdminSerializer, \
-    DeleteAdminSerializer, GroupMemberSerializer
+    DeleteAdminSerializer, GroupMemberSerializer, AddQuizToOrganization, RemoveQuizFromOrganization
 
 
 class IsOrganizationAdminOrReadOnly(permissions.BasePermission):
+    @staticmethod
+    def get_organization(obj):
+        return obj if isinstance(obj, Organization) else obj.organization
+
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        organization = obj if isinstance(obj, Organization) else obj.organization
+        organization = self.get_organization(obj)
         return organization.admins.filter(user=request.user).exists()
+
+
+class IsOrganizationAdminOrTeacherOrReadOnly(IsOrganizationAdminOrReadOnly):
+    def has_object_permission(self, request, view, obj):
+        if super().has_object_permission(request, view, obj):
+            return True
+
+        organization = self.get_organization(obj)
+        return organization.groups.filter(members__user=request.user, members__role=GroupMember.TEACHER_ROLE).exists()
 
 
 class OrganizationViewSet(ModelViewSet):
@@ -99,6 +113,49 @@ class OrganizationViewSet(ModelViewSet):
         serializer.is_valid(raise_exception=True)
         group = serializer.save()
         return Response(serializer.data)
+
+    @swagger_auto_schema(
+        responses={
+            status.HTTP_200_OK: QuizSerializer(many=True),
+            status.HTTP_404_NOT_FOUND: 'Organization not found.'
+        }
+    )
+    @action(
+        detail=True,
+        permission_classes=(permissions.IsAuthenticatedOrReadOnly, IsOrganizationAdminOrTeacherOrReadOnly)
+    )
+    def quizzes(self, *args, **kwargs):
+        """ База викторин организации. """
+        quizzes = self.get_object().quizzes.all().order_by('-id')
+        return Response(QuizSerializer(quizzes, many=True).data)
+
+    @swagger_auto_schema(
+        request_body=AddQuizToOrganization,
+        responses={
+            status.HTTP_200_OK: QuizSerializer,
+            status.HTTP_403_FORBIDDEN: status_text(status.HTTP_403_FORBIDDEN),
+            status.HTTP_404_NOT_FOUND: 'Organization not found.'
+        }
+    )
+    @quizzes.mapping.post
+    def add_quiz(self, request, *args, **kwargs):
+        """ Добавить викторину в базу викторин организации. """
+        organization = self.get_object()
+        serializer = AddQuizToOrganization(data=request.data, context={'organization': organization})
+        serializer.is_valid(raise_exception=True)
+        quiz = serializer.save()
+        return Response(QuizSerializer(quiz).data)
+
+    @swagger_auto_schema(request_body=RemoveQuizFromOrganization)
+    @quizzes.mapping.delete
+    def remove_quiz(self, request, *args, **kwargs):
+        """ Удалить викторину из базы викторин организации. """
+        organization = self.get_object()
+        serializer = RemoveQuizFromOrganization(data=request.data, context={'organization': organization})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 
 class GroupViewSet(mixins.RetrieveModelMixin,

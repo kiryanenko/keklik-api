@@ -1,6 +1,6 @@
 from django.db import models, transaction
 
-from api.models import User
+from api.models import User, Quiz
 
 
 class OrganizationManager(models.Manager):
@@ -13,6 +13,7 @@ class OrganizationManager(models.Manager):
 
 class Organization(models.Model):
     name = models.CharField(max_length=300)
+    quizzes = models.ManyToManyField(Quiz)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -49,9 +50,11 @@ class GroupMember(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='members')
     created_at = models.DateTimeField(auto_now=True)
 
+    STUDENT_ROLE = 'student'
+    TEACHER_ROLE = 'teacher'
     ROLE_CHOICES = (
-        ('student', 'Student'),
-        ('teacher', 'Teacher'),
+        (STUDENT_ROLE, 'Student'),
+        (TEACHER_ROLE, 'Teacher'),
     )
     role = models.CharField(max_length=100, choices=ROLE_CHOICES)
 

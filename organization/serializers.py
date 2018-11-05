@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from api.models import User
+from api.models import User, Quiz
 from api.serializers.user import UserSerializer, GetUserSerializer
 from organization.models import Organization, Group, Admin, GroupMember
 
@@ -115,3 +115,22 @@ class MemberOfGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = GroupMember
         fields = ('group', 'role', 'created_at')
+
+
+class AddQuizToOrganization(serializers.Serializer):
+    quiz = serializers.PrimaryKeyRelatedField(queryset=Quiz.objects.all())
+
+    def save(self, **kwargs):
+        quiz = self.validated_data['quiz']
+        orgainization = self.context['organization']
+        orgainization.quizzes.add(quiz)
+        return quiz
+
+
+class RemoveQuizFromOrganization(serializers.Serializer):
+    quiz = serializers.PrimaryKeyRelatedField(queryset=Quiz.objects.all())
+
+    def save(self, **kwargs):
+        quiz = self.validated_data['quiz']
+        orgainization = self.context['organization']
+        orgainization.quizzes.remove(quiz)
