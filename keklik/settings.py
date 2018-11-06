@@ -27,8 +27,7 @@ DEBUG = bool(os.environ.get('KEKLIK_API_DEBUG', True))
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
-    'keklik.xyz',
-    'api.keklik.xyz',
+    '.keklik.xyz',
     'keklik-api.herokuapp.com',
     'keklik.herokuapp.com'
 ]
