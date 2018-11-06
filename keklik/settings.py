@@ -148,6 +148,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 CORS_ORIGIN_WHITELIST = (
     'keklik.xyz',
+    'cp.keklik.xyz',
     'keklik.herokuapp.com',
     'keklik-dev.herokuapp.com',
     'localhost',
@@ -158,6 +159,7 @@ CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = (
     'keklik.xyz',
     'api.keklik.xyz',
+    'cp.keklik.xyz',
     'keklik-api.herokuapp.com',
     'keklik.herokuapp.com',
     'keklik-dev.herokuapp.com',
