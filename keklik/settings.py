@@ -152,6 +152,7 @@ CORS_ORIGIN_WHITELIST = (
     'keklik-dev.herokuapp.com',
     'localhost',
     'localhost:3000',
+    '176.119.156.90'
 )
 CORS_ALLOW_CREDENTIALS = True
 
@@ -164,6 +165,7 @@ CSRF_TRUSTED_ORIGINS = (
     'keklik-dev.herokuapp.com',
     'localhost',
     'localhost:3000',
+    '176.119.156.90'
 )
 
 
