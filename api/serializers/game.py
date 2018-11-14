@@ -5,6 +5,7 @@ from rest_framework.fields import empty
 from api.models import Game, GeneratedQuestion, Question, Player, Answer, Variant
 from api.serializers.quiz import QuizSerializer, VariantSerializer
 from api.serializers.user import UserSerializer
+from organization.serializers import OrganisationGroupSerializer
 
 
 class PlayerSerializer(serializers.ModelSerializer):
@@ -89,6 +90,7 @@ class GameSerializer(serializers.ModelSerializer):
     quiz = QuizSerializer()
     user = UserSerializer(read_only=True)
     players = PlayerSerializer(read_only=True, many=True)
+    group = OrganisationGroupSerializer(read_only=True)
     current_question = GeneratedQuestionSerializer(read_only=True)
     generated_questions = GeneratedQuestionSerializer(read_only=True, many=True)
     timer = serializers.DurationField(read_only=True, help_text='Оставшиеся время.')
