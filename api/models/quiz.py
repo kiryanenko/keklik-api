@@ -141,8 +141,11 @@ class Question(models.Model):
 
     @property
     def answer_str(self):
-        answer = list(map(lambda ans: Variant.objects.get(pk=ans).variant, self.answer))
-        return '; '.join(answer)
+        try:
+            answer = list(map(lambda ans: Variant.objects.get(pk=ans).variant, self.answer))
+            return '; '.join(answer)
+        except Variant.DoesNotExist:
+            return 'Variant does not exist.'
 
     def __str__(self):
         return '{}. {}'.format(self.number, self.question)

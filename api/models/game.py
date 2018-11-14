@@ -181,26 +181,33 @@ class Game(models.Model):
         worksheet = report.add_worksheet('Общее')
 
         worksheet.set_column('A:A', 30)
+        worksheet.set_column('B:B', 50)
 
         worksheet.write('A1', 'Отчет по проведенной викторине № {} за {}'.format(
-            self.pk, self.updated_at.strftime('%Y-%m-%d %H:%M')), styles.title)
+            self.pk, self.updated_at.now().strftime('%Y-%m-%d %H:%M')), styles.title)
         worksheet.set_row(0, 30)
         worksheet.write('A2', self.label)
 
         worksheet.write('A3', 'Дата:', styles.bold)
-        worksheet.write_datetime('B3', self.updated_at.now())
+        worksheet.write('B3', self.updated_at.now().strftime('%Y-%m-%d %H:%M'))
 
-        worksheet.write('A4', 'Количество участников:', styles.bold)
+        worksheet.write('A4', 'Организация:', styles.bold)
+        worksheet.write('B4', self.group.organization.name if self.group is not None else '-')
+
+        worksheet.write('A5', 'Группа:', styles.bold)
+        worksheet.write('B5', self.group.name if self.group is not None else '-')
+
+        worksheet.write('A7', 'Количество участников:', styles.bold)
         players_count = self.players.all().count()
-        worksheet.write_number('B4', players_count)
+        worksheet.write_number('B7', players_count)
 
-        worksheet.write('A5', 'Процент правильных ответов:', styles.bold)
+        worksheet.write('A8', 'Процент правильных ответов:', styles.bold)
         success_answers_count = Answer.objects.filter(question__game=self, correct=True).count()
         questions_count = self.generated_questions.all().count()
         answers_count = players_count * questions_count
         if answers_count == 0:
             answers_count = 1
-        worksheet.write_number('B5', success_answers_count / answers_count * 100)
+        worksheet.write_number('B8', success_answers_count / answers_count * 100)
 
     def report_answers_page(self, report, styles):
         worksheet = report.add_worksheet('Ответы участников')
@@ -250,7 +257,7 @@ class Game(models.Model):
             worksheet.write_number(success_answers_count_row, col, success_answers_count)
             answers_count = Answer.objects.filter(question=question).count()
             worksheet.write_number(answers_count_row, col, answers_count)
-            success_answers_percent = success_answers_count / players_count * 100
+            success_answers_percent = success_answers_count / players_count * 100 if players_count > 0 else 0
             worksheet.write_number(success_answers_percent_row, col, success_answers_percent)
 
         worksheet.set_column(data_start_col, data_start_col + questions_count - 1, 20)
