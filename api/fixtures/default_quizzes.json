@@ -1,0 +1,443 @@
+[
+  {
+    "title": "С++",
+    "description": "С++ викторина по программированию.",
+    "tags": [
+      "Программирование",
+      "С++"
+    ],
+    "questions": [
+      {
+        "type": "single",
+        "question": "Какой тип данных отвечает за целое число?",
+        "variants": [
+          {
+            "variant": "double"
+          },
+          {
+            "variant": "bool"
+          },
+          {
+            "variant": "float"
+          },
+          {
+            "variant": "int"
+          }
+        ],
+        "answer": [4],
+        "timer": null,
+        "points": 10
+      },
+      {
+        "type": "single",
+        "question": "Какая команда отвечает за итерационный цикл?",
+        "variants": [
+          {
+            "variant": "float"
+          },
+          {
+            "variant": "return"
+          },
+          {
+            "variant": "else"
+          },
+          {
+            "variant": "for"
+          }
+        ],
+        "answer": [4],
+        "timer": null,
+        "points": 10
+      },
+      {
+        "type": "single",
+        "question": "Как правильно создать массив целых чисел?",
+        "variants": [
+          {
+            "variant": "arr[100] bool;"
+          },
+          {
+            "variant": "int arr[100] int;"
+          },
+          {
+            "variant": "arr [100] int;"
+          },
+          {
+            "variant": "int arr[100];"
+          }
+        ],
+        "answer": [4],
+        "timer": null,
+        "points": 10
+      },
+      {
+        "type": "single",
+        "question": "Как проверить две переменные на строгое равенство?",
+        "variants": [
+          {
+            "variant": "if (a >= b)"
+          },
+          {
+            "variant": "if (a = b)"
+          },
+          {
+            "variant": "if (a != b)"
+          },
+          {
+            "variant": "if (a == b)"
+          }
+        ],
+        "answer": [4],
+        "timer": null,
+        "points": 10
+      },
+      {
+        "type": "single",
+        "question": "Какая команда отвечает за считывание данных с клавиатуры?",
+        "variants": [
+          {
+            "variant": "write"
+          },
+          {
+            "variant": "print"
+          },
+          {
+            "variant": "cout"
+          },
+          {
+            "variant": "cin"
+          }
+        ],
+        "answer": [4],
+        "timer": null,
+        "points": 10
+      },
+      {
+        "type": "single",
+        "question": "Какая команда позволяет получить длину строки?",
+        "variants": [
+          {
+            "variant": "strcmp"
+          },
+          {
+            "variant": "strcat"
+          },
+          {
+            "variant": "strcpy"
+          },
+          {
+            "variant": "strlen"
+          }
+        ],
+        "answer": [4],
+        "timer": null,
+        "points": 20
+      },
+      {
+        "type": "single",
+        "question": "С какого числа начинается нумерация элементов в массиве?",
+        "variants": [
+          {
+            "variant": "с числа 100"
+          },
+          {
+            "variant": "с числа -1"
+          },
+          {
+            "variant": "с числа 1"
+          },
+          {
+            "variant": "с числа 0"
+          }
+        ],
+        "answer": [4],
+        "timer": null,
+        "points": 10
+      },
+      {
+        "type": "single",
+        "question": "Какому значению соответствует логическая истина?",
+        "variants": [
+          {
+            "variant": "while"
+          },
+          {
+            "variant": "for"
+          },
+          {
+            "variant": "false"
+          },
+          {
+            "variant": "true"
+          }
+        ],
+        "answer": [4],
+        "timer": null,
+        "points": 25
+      },
+      {
+        "type": "single",
+        "question": "Как получить доступ к ячейке массива под номером x ?",
+        "variants": [
+          {
+            "variant": "a = x(arr);"
+          },
+          {
+            "variant": "a = arr{x};"
+          },
+          {
+            "variant": "a = x[arr];"
+          },
+          {
+            "variant": "a = arr[x];"
+          }
+        ],
+        "answer": [4],
+        "timer": null,
+        "points": 15
+      },
+      {
+        "type": "single",
+        "question": "Как создать переменную логического типа ?",
+        "variants": [
+          {
+            "variant": "double x;"
+          },
+          {
+            "variant": "int x;"
+          },
+          {
+            "variant": "float x;"
+          },
+          {
+            "variant": "bool x;"
+          }
+        ],
+        "answer": [4],
+        "timer": null,
+        "points": 10
+      }
+    ]
+  },
+
+  {
+    "title": "Викторина по Unity",
+    "description": "Викторина по Unity. Освоение базовых принципов. Разработка игр.",
+    "tags": [
+      "Программирование",
+      "Unity"
+    ],
+    "questions": [
+      {
+        "type": "single",
+        "question": "Какой тип данных отвечает за хранение целых чисел?",
+        "variants": [
+          {
+            "variant": "char"
+          },
+          {
+            "variant": "bool"
+          },
+          {
+            "variant": "float"
+          },
+          {
+            "variant": "int"
+          }
+        ],
+        "answer": [4],
+        "timer": null,
+        "points": 15
+      },
+      {
+        "type": "single",
+        "question": "Какая функция запускается один раз после инициализации объекта?",
+        "variants": [
+          {
+            "variant": "Repeat"
+          },
+          {
+            "variant": "Begin"
+          },
+          {
+            "variant": "Update"
+          },
+          {
+            "variant": "Start"
+          }
+        ],
+        "answer": [4],
+        "timer": null,
+        "points": 15
+      },
+      {
+        "type": "single",
+        "question": "Какая функция выполняется циклически у каждого объекта?",
+        "variants": [
+          {
+            "variant": "Play"
+          },
+          {
+            "variant": "Repeat"
+          },
+          {
+            "variant": "Start"
+          },
+          {
+            "variant": "Update"
+          }
+        ],
+        "answer": [4],
+        "timer": null,
+        "points": 15
+      },
+      {
+        "type": "single",
+        "question": "Какой тип данных отвечает за взаимодействие с персонажами в игре?",
+        "variants": [
+          {
+            "variant": "PlayPerson"
+          },
+          {
+            "variant": "PlayObject"
+          },
+          {
+            "variant": "GamePerson"
+          },
+          {
+            "variant": "GameObject"
+          }
+        ],
+        "answer": [4],
+        "timer": null,
+        "points": 5
+      },
+      {
+        "type": "single",
+        "question": "С помощью какой команды можно задать инструкцию ЕСЛИ ... ТО ... ?",
+        "variants": [
+          {
+            "variant": "return"
+          },
+          {
+            "variant": "false"
+          },
+          {
+            "variant": "true"
+          },
+          {
+            "variant": "if"
+          }
+        ],
+        "answer": [4],
+        "timer": null,
+        "points": 5
+      },
+      {
+        "type": "single",
+        "question": "С помощью какой команды можно сделать переменную общедоступной?",
+        "variants": [
+          {
+            "variant": "integer"
+          },
+          {
+            "variant": "protected"
+          },
+          {
+            "variant": "private"
+          },
+          {
+            "variant": "public"
+          }
+        ],
+        "answer": [4],
+        "timer": null,
+        "points": 20
+      },
+      {
+        "type": "single",
+        "question": "Что такое префаб?",
+        "variants": [
+          {
+            "variant": "Логический тип данных"
+          },
+          {
+            "variant": "Двумерный массив"
+          },
+          {
+            "variant": "Публичный метод класса"
+          },
+          {
+            "variant": "Шаблон объекта в игре"
+          }
+        ],
+        "answer": [4],
+        "timer": null,
+        "points": 25
+      },
+      {
+        "type": "single",
+        "question": "Чему соответствует значение логической истины?",
+        "variants": [
+          {
+            "variant": "Start"
+          },
+          {
+            "variant": "if"
+          },
+          {
+            "variant": "false"
+          },
+          {
+            "variant": "true"
+          }
+        ],
+        "answer": [4],
+        "timer": null,
+        "points": 5
+      },
+      {
+        "type": "single",
+        "question": "Где правильный вариант создания переменной?",
+        "variants": [
+          {
+            "variant": "k;"
+          },
+          {
+            "variant": "int k int;"
+          },
+          {
+            "variant": "k int;"
+          },
+          {
+            "variant": "int k;"
+          }
+        ],
+        "answer": [4],
+        "timer": null,
+        "points": 15
+      },
+      {
+        "type": "single",
+        "question": "Как проверить две переменные на строгое равенство ?",
+        "variants": [
+          {
+            "variant": "if (a >= b) { ... }"
+          },
+          {
+            "variant": "if (a != b) { ... }"
+          },
+          {
+            "variant": "if (a > b) { ... }"
+          },
+          {
+            "variant": "if (a == b) { ... }"
+          }
+        ],
+        "answer": [4],
+        "timer": null,
+        "points": 15
+      }
+    ]
+  }
+]

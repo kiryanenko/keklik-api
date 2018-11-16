@@ -1,9 +1,17 @@
+import json
+import logging
+import traceback
 from datetime import datetime
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models, transaction
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from api.models import User
+
+
+logger = logging.getLogger(__name__)
 
 
 class QuizManager(models.Manager):
@@ -33,7 +41,7 @@ class Quiz(models.Model):
     objects = QuizManager()
 
     @transaction.atomic
-    def update(self, title=None, description=None,  questions=None, tags=None):
+    def update(self, title=None, description=None, questions=None, tags=None):
         if title is description is questions is tags is None:
             return self
 
@@ -105,6 +113,25 @@ class Quiz(models.Model):
             question_clone.save()
 
         return quiz_clone
+
+    @staticmethod
+    @receiver(post_save, sender=User)
+    def add_default_quizzes(sender, instance, created, **kwargs):
+        if created:
+            try:
+                with open('api/fixtures/default_quizzes.json', 'r', encoding='utf-8') as fh:
+                    quizzes_data = json.load(fh)
+                    for quiz_data in quizzes_data:
+                        try:
+                            tags_data = quiz_data.pop('tags')
+                            tags = Tag.objects.get_or_create_tags(tags_data)
+                            Quiz.objects.create_quiz(user=instance, tags=tags, **quiz_data)
+                        except:
+                            logger.error('Error at adding default quiz:\n' + quiz_data)
+                            logger.error(traceback.format_exc())
+            except:
+                logger.error('Error at adding default quizzes.')
+                logger.error(traceback.format_exc())
 
     def __str__(self):
         return '[{}] {} - {}'.format(self.pk, self.title, self.version_date)
