@@ -71,7 +71,7 @@
   },
   {
     "model": "api.quiz",
-    "pk": 6,
+    "pk": 106,
     "fields": {
       "title": "string",
       "description": "string",

@@ -42,7 +42,7 @@
     "model": "api.question",
     "pk": 4,
     "fields": {
-      "quiz": 6,
+      "quiz": 106,
       "number": 1,
       "type": "single",
       "question": "string",
@@ -55,7 +55,7 @@
     "model": "api.question",
     "pk": 5,
     "fields": {
-      "quiz": 6,
+      "quiz": 106,
       "number": 2,
       "type": "single",
       "question": "string",
@@ -68,7 +68,7 @@
     "model": "api.question",
     "pk": 6,
     "fields": {
-      "quiz": 6,
+      "quiz": 106,
       "number": 3,
       "type": "single",
       "question": "string",
@@ -81,7 +81,7 @@
     "model": "api.question",
     "pk": 7,
     "fields": {
-      "quiz": 6,
+      "quiz": 106,
       "number": 4,
       "type": "single",
       "question": "string",
@@ -94,7 +94,7 @@
     "model": "api.question",
     "pk": 8,
     "fields": {
-      "quiz": 6,
+      "quiz": 106,
       "number": 5,
       "type": "single",
       "question": "string",
@@ -107,7 +107,7 @@
     "model": "api.question",
     "pk": 9,
     "fields": {
-      "quiz": 6,
+      "quiz": 106,
       "number": 7,
       "type": "single",
       "question": "string",
@@ -120,7 +120,7 @@
     "model": "api.question",
     "pk": 10,
     "fields": {
-      "quiz": 6,
+      "quiz": 106,
       "number": 8,
       "type": "single",
       "question": "string",
