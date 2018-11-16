@@ -24,6 +24,7 @@ from api.urls import media_urlpatterns as api_media_urlpatterns
 api_urlpatterns = [
     url(r'^', include('api.urls')),
     url(r'^', include('organization.urls')),
+    url(r'^', include('stats.urls')),
     url(r'^channels/', include('channels_api.urls'))
 ]
 
