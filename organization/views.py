@@ -2,12 +2,12 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import permissions, mixins, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.viewsets import GenericViewSet
 
 from api.models import Game
 from api.serializers.game import GameSerializer
 from api.serializers.quiz import QuizSerializer
-from api.utils.views import status_text
+from api.utils.views import status_text, CustomModelViewSet, CustomGenericViewSet
 from organization.models import Organization, Group, GroupMember
 from organization.serializers import OrganizationDetailSerializer, GroupSerializer, AdminSerializer, AddAdminSerializer, \
     DeleteAdminSerializer, GroupMemberSerializer, AddQuizToOrganization, RemoveQuizFromOrganization
@@ -35,7 +35,7 @@ class IsOrganizationAdminOrTeacherOrReadOnly(IsOrganizationAdminOrReadOnly):
         return organization.groups.filter(members__user=request.user, members__role=GroupMember.TEACHER_ROLE).exists()
 
 
-class OrganizationViewSet(ModelViewSet):
+class OrganizationViewSet(CustomModelViewSet):
     queryset = Organization.objects.all()
     serializer_class = OrganizationDetailSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOrganizationAdminOrReadOnly)
@@ -46,12 +46,12 @@ class OrganizationViewSet(ModelViewSet):
             status.HTTP_404_NOT_FOUND: 'Organization not found.'
         }
     )
-    @action(detail=True)
+    @action(detail=True, serializer_class=AdminSerializer)
     def admins(self, *args, **kwargs):
         """ Список админов организации. """
         organization = self.get_object()
         admins = organization.admins.all().order_by('id')
-        return Response(AdminSerializer(admins, many=True).data)
+        return self.get_list_response(admins)
 
     @swagger_auto_schema(
         request_body=AddAdminSerializer,
@@ -91,12 +91,12 @@ class OrganizationViewSet(ModelViewSet):
             status.HTTP_404_NOT_FOUND: 'Organization not found.'
         }
     )
-    @action(detail=True)
+    @action(detail=True, serializer_class=GroupSerializer)
     def groups(self, *args, **kwargs):
         """ Список групп организации. """
         organization = self.get_object()
         groups = organization.groups.all().order_by('-id')
-        return Response(GroupSerializer(groups, many=True).data)
+        return self.get_list_response(groups)
 
     @swagger_auto_schema(
         request_body=GroupSerializer,
@@ -122,12 +122,13 @@ class OrganizationViewSet(ModelViewSet):
     )
     @action(
         detail=True,
-        permission_classes=(permissions.IsAuthenticatedOrReadOnly, IsOrganizationAdminOrTeacherOrReadOnly)
+        permission_classes=(permissions.IsAuthenticatedOrReadOnly, IsOrganizationAdminOrTeacherOrReadOnly),
+        serializer_class=QuizSerializer
     )
     def quizzes(self, *args, **kwargs):
         """ База викторин организации. """
         quizzes = self.get_object().quizzes.all().order_by('-id')
-        return Response(QuizSerializer(quizzes, many=True).data)
+        return self.get_list_response(quizzes)
 
     @swagger_auto_schema(
         request_body=AddQuizToOrganization,
@@ -157,12 +158,11 @@ class OrganizationViewSet(ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-
 class GroupViewSet(mixins.RetrieveModelMixin,
                    mixins.UpdateModelMixin,
                    mixins.DestroyModelMixin,
                    mixins.ListModelMixin,
-                   GenericViewSet):
+                   CustomGenericViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOrganizationAdminOrReadOnly)
@@ -173,11 +173,12 @@ class GroupViewSet(mixins.RetrieveModelMixin,
             status.HTTP_404_NOT_FOUND: 'Group not found.'
         }
     )
-    @action(detail=True)
+    @action(detail=True, serializer_class=GroupMemberSerializer)
     def members(self, request, *args, **kwargs):
         """ Члены группы. """
         group = self.get_object()
-        return Response(GroupMemberSerializer(group.members.all(), many=True).data)
+        members = group.members.all()
+        return self.get_list_response(members)
 
     @swagger_auto_schema(
         request_body=GroupMemberSerializer,
@@ -201,12 +202,12 @@ class GroupViewSet(mixins.RetrieveModelMixin,
             status.HTTP_404_NOT_FOUND: 'Group not found.'
         }
     )
-    @action(detail=True)
+    @action(detail=True, serializer_class=GameSerializer)
     def games(self, *args, **kwarg):
         """ История проведенных игр опубликованные в этой группе. """
         group = self.get_object()
         games = group.games.all().order_by('-id')
-        return Response(GameSerializer(games, many=True).data)
+        return self.get_list_response(games)
 
     @swagger_auto_schema(
         responses={

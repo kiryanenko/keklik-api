@@ -8,14 +8,14 @@ from rest_framework.viewsets import GenericViewSet
 
 from api.models import Game
 from api.serializers.game import GameSerializer, CreateGameSerializer, PlayerSerializer
-from api.utils.views import status_text
+from api.utils.views import status_text, CustomGenericViewSet
 
 
 class GameViewSet(mixins.CreateModelMixin,
                   mixins.RetrieveModelMixin,
                   mixins.ListModelMixin,
                   mixins.DestroyModelMixin,
-                  GenericViewSet):
+                  CustomGenericViewSet):
     queryset = Game.objects.all()
     serializer_class = GameSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
@@ -53,8 +53,7 @@ class GameViewSet(mixins.CreateModelMixin,
     def my(self, request, *args, **kwargs):
         """ Созданные игры текущим пользователем (учителем). """
         games = self.get_user_games(request.user)
-        serializer = self.get_serializer(games, many=True)
-        return Response(serializer.data)
+        return self.get_list_response(games)
 
     @swagger_auto_schema(operation_id='my_running_games')
     @action(
@@ -65,15 +64,13 @@ class GameViewSet(mixins.CreateModelMixin,
     def my_running(self, request, *args, **kwargs):
         """ Запущенные игры текущим пользователем (учителем). """
         games = self.get_user_games(request.user).exclude(state=Game.FINISH_STATE)
-        serializer = self.get_serializer(games, many=True)
-        return Response(serializer.data)
+        return self.get_list_response(games)
 
     @action(detail=False, permission_classes=(permissions.IsAuthenticated,))
     def current_player(self, request, *args, **kwarg):
         """ Игры текущего игрока. """
         games = self.get_player_games(request.user)
-        serializer = self.get_serializer(games, many=True)
-        return Response(serializer.data)
+        return self.get_list_response(games)
 
     @swagger_auto_schema(operation_id='current_player_running_games')
     @action(
@@ -84,8 +81,7 @@ class GameViewSet(mixins.CreateModelMixin,
     def current_player_running(self, request, *args, **kwarg):
         """ Незавершенные игры текущего игрока. """
         games = self.get_player_games(request.user).exclude(state=Game.FINISH_STATE)
-        serializer = self.get_serializer(games, many=True)
-        return Response(serializer.data)
+        return self.get_list_response(games)
 
     def get_user_games(self, user):
         return self.filter_queryset(self.get_queryset().filter(user=user))
