@@ -7,3 +7,4 @@ class StatsSerializer(serializers.Serializer):
     organizations_count = serializers.IntegerField()
     groups_count = serializers.IntegerField()
     quizzes_count = serializers.IntegerField(help_text='Количество шаблонов викторин.')
+    questions_count = serializers.IntegerField(help_text='Количество созданных вопросов для викторин.')
