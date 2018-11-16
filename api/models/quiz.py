@@ -157,6 +157,7 @@ class Variant(models.Model):
 
     class Meta:
         unique_together = ('variant', 'question')
+        ordering = ('id',)
 
     def __str__(self):
         return self.variant
