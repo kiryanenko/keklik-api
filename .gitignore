@@ -21,3 +21,6 @@ tests/report/
 
 staticfiles/
 logs/
+env/
+
+*.log
