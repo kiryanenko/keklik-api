@@ -321,11 +321,14 @@ class Game(models.Model):
         if not correct:
             return 0
 
-        timer = generated_question.question.timer
-        coefficient = (timezone.now() - generated_question.started_at) / timer if timer is not None else 1
-        if coefficient < 0:
-            coefficient = 0
-        return generated_question.question.points + generated_question.question.points * coefficient
+        # Очки зависят от скорости ответа
+        # timer = generated_question.question.timer
+        # coefficient = (timezone.now() - generated_question.started_at) / timer if timer is not None else 1
+        # if coefficient < 0:
+        #     coefficient = 0
+        # return generated_question.question.points + generated_question.question.points * coefficient
+
+        return generated_question.question.points
 
     def __str__(self):
         return '[{}] {} {} {}'.format(self.pk, self.state, self.label, self.quiz)
