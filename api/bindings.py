@@ -30,7 +30,14 @@ class GameBinding(GroupMixin, mixins.SubscribeModelMixin, ReadOnlyResourceBindin
     model = Game
     stream = "games"
     serializer_class = GameSerializer
-    queryset = Game.objects.all()
+    queryset = Game.objects\
+        .select_related('quiz__user', 'user', 'group__organization', 'current_question')\
+        .prefetch_related('players__user',
+                          'quiz__tags',
+                          'quiz__questions',
+                          'generated_questions',
+                          'generated_questions__question',
+                          'generated_questions__players_answers',)
     permission_classes = (permissions.IsAuthenticated,)
 
     JOIN_SUB = 'join'

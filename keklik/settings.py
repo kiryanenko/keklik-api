@@ -194,5 +194,32 @@ SWAGGER_SETTINGS = {
     }
 }
 
+# import logging
+# log = logging.getLogger('django.db.backends')
+# log.setLevel(logging.DEBUG)
+# log.addHandler(logging.StreamHandler())
 
-django_heroku.settings(locals())
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        }
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        }
+    },
+    'loggers': {
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        }
+    }
+}
+
+if not DEBUG:
+    django_heroku.settings(locals())

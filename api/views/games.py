@@ -16,7 +16,14 @@ class GameViewSet(mixins.CreateModelMixin,
                   mixins.ListModelMixin,
                   mixins.DestroyModelMixin,
                   CustomGenericViewSet):
-    queryset = Game.objects.all()
+    queryset = Game.objects\
+            .select_related('quiz__user', 'user', 'group__organization', 'current_question')\
+            .prefetch_related('players__user',
+                              'quiz__tags',
+                              'quiz__questions',
+                              'generated_questions',
+                              'generated_questions__question',
+                              'generated_questions__players_answers',)
     serializer_class = GameSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
@@ -47,12 +54,20 @@ class GameViewSet(mixins.CreateModelMixin,
     @action(detail=True)
     def rating(self, request, *args, **kwargs):
         game = self.get_object()
-        return Response(PlayerSerializer(game.players_rating, many=True).data)
+        players_rating = game.players_rating.select_related('user')
+        return Response(PlayerSerializer(players_rating, many=True).data)
 
     @action(detail=False, permission_classes=(permissions.IsAuthenticated,))
     def my(self, request, *args, **kwargs):
         """ Созданные игры текущим пользователем (учителем). """
-        games = self.get_user_games(request.user)
+        games = self.get_user_games(request.user)\
+            .select_related('quiz__user', 'user', 'group__organization', 'current_question')\
+            .prefetch_related('players__user',
+                              'quiz__tags',
+                              'quiz__questions',
+                              'generated_questions',
+                              'generated_questions__question',
+                              'generated_questions__players_answers',)
         return self.get_list_response(games)
 
     @swagger_auto_schema(operation_id='my_running_games')
@@ -63,13 +78,27 @@ class GameViewSet(mixins.CreateModelMixin,
     )
     def my_running(self, request, *args, **kwargs):
         """ Запущенные игры текущим пользователем (учителем). """
-        games = self.get_user_games(request.user).exclude(state=Game.FINISH_STATE)
+        games = self.get_user_games(request.user).exclude(state=Game.FINISH_STATE)\
+            .select_related('quiz__user', 'user', 'group__organization', 'current_question')\
+            .prefetch_related('players__user',
+                              'quiz__tags',
+                              'quiz__questions',
+                              'generated_questions',
+                              'generated_questions__question',
+                              'generated_questions__players_answers',)
         return self.get_list_response(games)
 
     @action(detail=False, permission_classes=(permissions.IsAuthenticated,))
     def current_player(self, request, *args, **kwarg):
         """ Игры текущего игрока. """
-        games = self.get_player_games(request.user)
+        games = self.get_player_games(request.user)\
+            .select_related('quiz__user', 'user', 'group__organization', 'current_question')\
+            .prefetch_related('players__user',
+                              'quiz__tags',
+                              'quiz__questions',
+                              'generated_questions',
+                              'generated_questions__question',
+                              'generated_questions__players_answers',)
         return self.get_list_response(games)
 
     @swagger_auto_schema(operation_id='current_player_running_games')
@@ -80,7 +109,14 @@ class GameViewSet(mixins.CreateModelMixin,
     )
     def current_player_running(self, request, *args, **kwarg):
         """ Незавершенные игры текущего игрока. """
-        games = self.get_player_games(request.user).exclude(state=Game.FINISH_STATE)
+        games = self.get_player_games(request.user).exclude(state=Game.FINISH_STATE)\
+            .select_related('quiz__user', 'user', 'group__organization', 'current_question')\
+            .prefetch_related('players__user',
+                              'quiz__tags',
+                              'quiz__questions',
+                              'generated_questions',
+                              'generated_questions__question',
+                              'generated_questions__players_answers',)
         return self.get_list_response(games)
 
     def get_user_games(self, user):
@@ -91,7 +127,14 @@ class GameViewSet(mixins.CreateModelMixin,
 
 
 class MediaGameViewSet(GenericViewSet):
-    queryset = Game.objects.all()
+    queryset = Game.objects\
+            .select_related('quiz__user', 'user', 'group__organization', 'current_question')\
+            .prefetch_related('players__user',
+                              'quiz__tags',
+                              'quiz__questions',
+                              'generated_questions',
+                              'generated_questions__question',
+                              'generated_questions__players_answers',)
     serializer_class = GameSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
