@@ -410,13 +410,15 @@ class GeneratedQuestion(models.Model):
 
 
 class Player(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='players')
-    rating = models.IntegerField(default=0, help_text='Рейтинг за игру.')
-    created_at = models.DateTimeField(auto_now_add=True)
-    finished_at = models.DateTimeField(null=True, db_index=True)
+    user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, verbose_name='Игра', on_delete=models.CASCADE, related_name='players')
+    rating = models.IntegerField(verbose_name='Очки', default=0, help_text='Рейтинг за игру.')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Время присоединения')
+    finished_at = models.DateTimeField(verbose_name='Время завершения игры', null=True, db_index=True)
 
     class Meta:
+        verbose_name = 'Игрок'
+        verbose_name_plural = 'Игроки'
         unique_together = ('user', 'game')
 
     def finish(self):
@@ -424,7 +426,7 @@ class Player(models.Model):
         self.save()
 
     def __str__(self):
-        return '[{}] {}'.format(self.pk, self.user)
+        return str(self.user)
 
 
 class Answer(models.Model):

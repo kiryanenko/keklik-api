@@ -4,10 +4,8 @@ from django.contrib.auth.admin import UserAdmin
 from api.models import User, Quiz, Question, Variant, Tag, Game, GeneratedQuestion, Player, Answer
 
 admin.site.register(User, UserAdmin)
-
 admin.site.register(Tag)
 
-admin.site.register(Player)
 admin.site.register(Answer)
 
 
@@ -77,6 +75,16 @@ class GeneratedQuestionInline(admin.TabularInline):
     extra = 0
 
 
+class PlayerInline(admin.TabularInline):
+    model = Player
+    fields = ('user', 'rating', 'created_at', 'finished_at')
+    readonly_fields = ('created_at',)
+    ordering = ('-game', '-created_at', '-id')
+    raw_id_fields = ('user',)
+    show_change_link = True
+    extra = 3
+
+
 @admin.register(Game)
 class GameAdmin(admin.ModelAdmin):
     fields = ('label', 'quiz', 'online', 'state', 'current_question', 'user', 'organization', 'group',
@@ -92,7 +100,8 @@ class GameAdmin(admin.ModelAdmin):
     raw_id_fields = ('quiz', 'user', 'group', 'current_question')
 
     inlines = [
-        GeneratedQuestionInline
+        GeneratedQuestionInline,
+        PlayerInline
     ]
 
     def organization(self, obj):
@@ -112,3 +121,15 @@ class GeneratedQuestionAdmin(admin.ModelAdmin):
     search_fields = ('question',)
     ordering = ('game', 'question__number', 'id',)
     raw_id_fields = ('question', 'game')
+
+
+@admin.register(Player)
+class GameAdmin(admin.ModelAdmin):
+    fields = ('user', 'game', 'rating', 'created_at', 'finished_at')
+    readonly_fields = ('created_at',)
+    list_display = ('user', 'game', 'rating', 'finished_at')
+    list_filter = ('created_at',)
+    date_hierarchy = 'created_at'
+    search_fields = ('user',)
+    ordering = ('-game', '-created_at', '-id')
+    raw_id_fields = ('game', 'user')
