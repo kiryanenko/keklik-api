@@ -28,11 +28,14 @@ class Organization(models.Model):
 
 
 class Admin(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='admins')
-    created_at = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, verbose_name='Организация', on_delete=models.CASCADE,
+                                     related_name='admins')
+    created_at = models.DateTimeField(auto_now=True, verbose_name='Дата назначения')
 
     class Meta:
+        verbose_name = 'Админ организации'
+        verbose_name_plural = 'Админы организаций'
         unique_together = ('organization', 'user')
 
     def __str__(self):
