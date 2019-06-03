@@ -12,10 +12,14 @@ class OrganizationManager(models.Manager):
 
 
 class Organization(models.Model):
-    name = models.CharField(max_length=300)
-    quizzes = models.ManyToManyField(Quiz)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    class Meta:
+        verbose_name = 'Организация'
+        verbose_name_plural = 'Организации'
+
+    name = models.CharField(verbose_name='Название', max_length=300)
+    quizzes = models.ManyToManyField(Quiz, verbose_name='Викторины организации')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата изменения')
 
     objects = OrganizationManager()
 
