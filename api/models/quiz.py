@@ -204,7 +204,11 @@ class TagManager(models.Manager):
 
 
 class Tag(models.Model):
-    tag = models.CharField(max_length=50, unique=True, db_index=True)
+    class Meta:
+        verbose_name = 'Тег'
+        verbose_name_plural = 'Теги'
+
+    tag = models.CharField(verbose_name='Тег', max_length=50, unique=True, db_index=True)
 
     objects = TagManager()
 
