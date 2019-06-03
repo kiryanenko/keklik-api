@@ -30,13 +30,17 @@ class QuizManager(models.Manager):
 
 
 class Quiz(models.Model):
-    title = models.CharField(max_length=300, db_index=True)
-    description = models.TextField(blank=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    tags = models.ManyToManyField('Tag')
-    rating = models.IntegerField(default=0, db_index=True)
-    version_date = models.DateTimeField(auto_now_add=True)
-    old_version = models.ForeignKey('Quiz', on_delete=models.CASCADE, null=True)
+    class Meta:
+        verbose_name = 'Викторина'
+        verbose_name_plural = 'Викторины'
+
+    title = models.CharField(verbose_name='Название', max_length=300, db_index=True)
+    description = models.TextField(verbose_name='Описание', blank=True)
+    user = models.ForeignKey(User, verbose_name='Автор', on_delete=models.CASCADE)
+    tags = models.ManyToManyField('Tag', verbose_name='Теги')
+    rating = models.IntegerField(verbose_name='Рейтинг', default=0, db_index=True)
+    version_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата версии')
+    old_version = models.ForeignKey('Quiz', verbose_name='Предыдущая версия', on_delete=models.CASCADE, null=True)
 
     objects = QuizManager()
 
@@ -134,7 +138,7 @@ class Quiz(models.Model):
                 logger.error(traceback.format_exc())
 
     def __str__(self):
-        return '[{}] {} - {}'.format(self.pk, self.title, self.version_date)
+        return self.title
 
 
 class Question(models.Model):

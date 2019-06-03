@@ -5,13 +5,24 @@ from api.models import User, Quiz, Question, Variant, Tag, Game, GeneratedQuesti
 
 admin.site.register(User, UserAdmin)
 
-admin.site.register(Quiz)
 admin.site.register(Question)
 admin.site.register(Variant)
 admin.site.register(Tag)
 
 admin.site.register(Player)
 admin.site.register(Answer)
+
+
+@admin.register(Quiz)
+class QuizAdmin(admin.ModelAdmin):
+    fields = ('title', 'description', 'user', 'tags', 'rating', 'version_date', 'old_version')
+    readonly_fields = ('version_date',)
+    list_display = ('title', 'description', 'user', 'rating', 'version_date', 'old_version')
+    list_filter = ('tags', 'version_date')
+    date_hierarchy = 'version_date'
+    search_fields = ('title', 'description', 'tags')
+    ordering = ('-version_date', '-id')
+    raw_id_fields = ('old_version', 'user',)
 
 
 @admin.register(Game)
