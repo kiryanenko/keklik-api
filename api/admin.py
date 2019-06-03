@@ -10,7 +10,6 @@ admin.site.register(Question)
 admin.site.register(Variant)
 admin.site.register(Tag)
 
-admin.site.register(GeneratedQuestion)
 admin.site.register(Player)
 admin.site.register(Answer)
 
@@ -41,3 +40,14 @@ class GameAdmin(admin.ModelAdmin):
             pass
             # kwargs["queryset"] = Car.objects.filter(owner=request.user)
         return super(GameAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
+
+@admin.register(GeneratedQuestion)
+class GeneratedQuestionAdmin(admin.ModelAdmin):
+    fields = ('question', 'game', 'variants_order', 'started_at')
+    list_display = ('question', 'game', 'variants_order', 'started_at')
+    list_filter = ('game__created_at',)
+    date_hierarchy = 'game__created_at'
+    search_fields = ('question',)
+    ordering = ('-id',)
+    raw_id_fields = ('question', 'game')

@@ -357,12 +357,18 @@ class GeneratedQuestionManager(models.Manager):
 
 
 class GeneratedQuestion(models.Model):
-    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name='generated_questions')
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    class Meta:
+        verbose_name = 'Сгенерированный вопрос'
+        verbose_name_plural = 'Сгенерированные вопросы'
+
+    game = models.ForeignKey(Game, verbose_name='Игра', on_delete=models.CASCADE, related_name='generated_questions')
+    question = models.ForeignKey(Question, verbose_name='Вопрос', on_delete=models.CASCADE)
     variants_order = ArrayField(
-        models.IntegerField(), help_text='ID вариантов. При создании новой игры варианты перемешиваются.'
+        models.IntegerField(), verbose_name='Порядок вариантов',
+        help_text='ID вариантов. При создании новой игры варианты перемешиваются.',
     )
-    started_at = models.DateTimeField(null=True)
+    started_at = models.DateTimeField(verbose_name='Время старта', help_text='Время, когда запустился этот вопрос.',
+                                      null=True)
 
     objects = GeneratedQuestionManager()
 
@@ -400,7 +406,7 @@ class GeneratedQuestion(models.Model):
         return '; '.join(variants)
 
     def __str__(self):
-        return '[{}] {}'.format(self.pk, self.question)
+        return str(self.question)
 
 
 class Player(models.Model):
