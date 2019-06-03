@@ -6,8 +6,6 @@ from api.models import User, Quiz, Question, Variant, Tag, Game, GeneratedQuesti
 admin.site.register(User, UserAdmin)
 admin.site.register(Tag)
 
-admin.site.register(Answer)
-
 
 class QuestionInline(admin.StackedInline):
     model = Question
@@ -79,10 +77,20 @@ class PlayerInline(admin.TabularInline):
     model = Player
     fields = ('user', 'rating', 'created_at', 'finished_at')
     readonly_fields = ('created_at',)
-    ordering = ('-game', '-created_at', '-id')
+    ordering = ('-rating', '-created_at', '-id')
     raw_id_fields = ('user',)
     show_change_link = True
     extra = 3
+
+
+class AnswerInline(admin.TabularInline):
+    model = Answer
+    fields = ('question', 'player', 'answer', 'correct', 'points', 'answered_at')
+    readonly_fields = ('answered_at',)
+    ordering = ('question__question__number', 'question__question__id', 'answered_at', 'id')
+    raw_id_fields = ('question', 'player')
+    show_change_link = True
+    extra = 0
 
 
 @admin.register(Game)
@@ -122,9 +130,13 @@ class GeneratedQuestionAdmin(admin.ModelAdmin):
     ordering = ('game', 'question__number', 'id',)
     raw_id_fields = ('question', 'game')
 
+    inlines = [
+        AnswerInline
+    ]
+
 
 @admin.register(Player)
-class GameAdmin(admin.ModelAdmin):
+class PlayerAdmin(admin.ModelAdmin):
     fields = ('user', 'game', 'rating', 'created_at', 'finished_at')
     readonly_fields = ('created_at',)
     list_display = ('user', 'game', 'rating', 'finished_at')
@@ -133,3 +145,19 @@ class GameAdmin(admin.ModelAdmin):
     search_fields = ('user',)
     ordering = ('-game', '-created_at', '-id')
     raw_id_fields = ('game', 'user')
+
+    inlines = [
+        AnswerInline
+    ]
+
+
+@admin.register(Answer)
+class AnswerAdmin(admin.ModelAdmin):
+    fields = ('player', 'question', 'answer', 'correct', 'points', 'answered_at')
+    readonly_fields = ('answered_at',)
+    list_display = ('player', 'question', 'answer', 'correct', 'points', 'answered_at')
+    list_filter = ('correct', 'answered_at')
+    date_hierarchy = 'answered_at'
+    search_fields = ('player__user', 'question')
+    ordering = ('-question__game', '-question__question__number', '-question__question__id', '-answered_at', '-id')
+    raw_id_fields = ('player', 'question')

@@ -430,16 +430,21 @@ class Player(models.Model):
 
 
 class Answer(models.Model):
-    player = models.ForeignKey(Player, on_delete=models.CASCADE)
-    question = models.ForeignKey(GeneratedQuestion, on_delete=models.CASCADE, related_name='players_answers')
+    class Meta:
+        verbose_name = 'Ответ игрока'
+        verbose_name_plural = 'Ответы игроков'
+
+    player = models.ForeignKey(Player, verbose_name='Игрок', on_delete=models.CASCADE)
+    question = models.ForeignKey(GeneratedQuestion, verbose_name='Вопрос', on_delete=models.CASCADE, related_name='players_answers')
     answer = ArrayField(
-        models.IntegerField(), help_text='ID правильных вариантов ответов.\n'
-                                         'Для Single вопросов массив состоит из одного элемента.\n'
-                                         'Для Sequence важен порядок.'
+        models.IntegerField(), verbose_name='Ответ',
+        help_text='ID вариантов ответов.\n'
+                  'Для Single вопросов массив состоит из одного элемента.\n'
+                  'Для Sequence важен порядок.'
     )
-    correct = models.BooleanField(default=False)
-    points = models.IntegerField(default=0, help_text='Начисленные очки за ответ.')
-    answered_at = models.DateTimeField(auto_now=True)
+    correct = models.BooleanField(verbose_name='Верный ответ?', default=False)
+    points = models.IntegerField(verbose_name='Начисленные очки за ответ', default=0)
+    answered_at = models.DateTimeField(auto_now=True, verbose_name='Время ответа')
 
     @property
     def answer_str(self):
