@@ -142,31 +142,33 @@ class Quiz(models.Model):
 
 
 class Question(models.Model):
-    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')
-    number = models.SmallIntegerField(db_index=True, help_text='Номер вопроса, начиная с 1.\n'
-                                                               'Соответствует порядковому номеру в массиве.')
+    quiz = models.ForeignKey(Quiz, verbose_name='Викторина', on_delete=models.CASCADE, related_name='questions')
+    number = models.SmallIntegerField(verbose_name='Номер вопроса',
+                                      help_text='Номер вопроса, начиная с 1.\n'
+                                                'Соответствует порядковому номеру в массиве.',
+                                      db_index=True)
 
     TYPE_CHOICES = (
         ('single', 'Single - один верный ответ'),
         ('multi', 'Multi - несколько верных ответов'),
         ('sequence', 'Sequence - правильная последовательность'),
     )
-    type = models.CharField(max_length=10, choices=TYPE_CHOICES, help_text='Single - один верный ответ;\n'
-                                                                           'Multi - несколько верных ответов;\n'
-                                                                           'Sequence - правильная последовательность.')
+    type = models.CharField(choices=TYPE_CHOICES, verbose_name='Тип вопроса', max_length=10)
 
-    question = models.TextField(help_text='Текст вопроса.')
+    question = models.TextField(verbose_name='Текст вопроса')
     answer = ArrayField(
-        models.IntegerField(), help_text='ID правильных вариантов ответов.\n'
-                                         'Для Single вопросов массив состоит из одного элемента.\n'
-                                         'Для Sequence важен порядок.\n'
-                                         'При создании и изменении викторины указывать порядковый номер '
-                                         'в массиве вариантов (номер начинается с 1).'
+        models.IntegerField(), verbose_name='ID правильных вариантов ответов',
+        help_text='Для Single вопросов массив состоит из одного элемента.\n'
+                  'Для Sequence важен порядок.\n'
+                  'При создании и изменении викторины указывать порядковый номер '
+                  'в массиве вариантов (номер начинается с 1).'
     )
-    timer = models.DurationField(null=True, help_text='Таймер. Null означает, что таймера нет.')
-    points = models.IntegerField(help_text='Очки за правильный ответ')
+    timer = models.DurationField(null=True, verbose_name='Таймер', help_text='Таймер. Null означает, что таймера нет.')
+    points = models.IntegerField(verbose_name='Очки за правильный ответ')
 
     class Meta:
+        verbose_name = 'Вопрос'
+        verbose_name_plural = 'Вопросы'
         unique_together = ('quiz', 'number')
         ordering = ('quiz', 'number')
 

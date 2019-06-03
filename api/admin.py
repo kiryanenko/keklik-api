@@ -5,12 +5,18 @@ from api.models import User, Quiz, Question, Variant, Tag, Game, GeneratedQuesti
 
 admin.site.register(User, UserAdmin)
 
-admin.site.register(Question)
 admin.site.register(Variant)
 admin.site.register(Tag)
 
 admin.site.register(Player)
 admin.site.register(Answer)
+
+
+class QuestionInline(admin.StackedInline):
+    model = Question
+    fields = ('question', 'number', 'type', 'answer', 'timer', 'points')
+    ordering = ('number', '-id')
+    extra = 1
 
 
 @admin.register(Quiz)
@@ -23,6 +29,21 @@ class QuizAdmin(admin.ModelAdmin):
     search_fields = ('title', 'description', 'tags')
     ordering = ('-version_date', '-id')
     raw_id_fields = ('old_version', 'user',)
+
+    inlines = [
+        QuestionInline
+    ]
+
+
+@admin.register(Question)
+class QuestionAdmin(admin.ModelAdmin):
+    fields = ('question', 'number', 'type', 'quiz', 'answer', 'timer', 'points')
+    list_display = ('question', 'number', 'type', 'quiz', 'points')
+    list_filter = ('type', 'quiz__tags', 'quiz__version_date')
+    date_hierarchy = 'quiz__version_date'
+    search_fields = ('question', 'number', 'title', 'description', 'tags')
+    ordering = ('-quiz', 'number', '-id')
+    raw_id_fields = ('quiz',)
 
 
 @admin.register(Game)
@@ -46,12 +67,6 @@ class GameAdmin(admin.ModelAdmin):
 
     organization.short_description = 'Организация'
 
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "car":
-            pass
-            # kwargs["queryset"] = Car.objects.filter(owner=request.user)
-        return super(GameAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
-
 
 @admin.register(GeneratedQuestion)
 class GeneratedQuestionAdmin(admin.ModelAdmin):
@@ -60,5 +75,5 @@ class GeneratedQuestionAdmin(admin.ModelAdmin):
     list_filter = ('game__created_at',)
     date_hierarchy = 'game__created_at'
     search_fields = ('question',)
-    ordering = ('-id',)
+    ordering = ('game', 'question__number', '-id',)
     raw_id_fields = ('question', 'game')
