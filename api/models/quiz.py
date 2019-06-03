@@ -185,10 +185,12 @@ class Question(models.Model):
 
 
 class Variant(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='variants')
-    variant = models.CharField(max_length=300)
+    question = models.ForeignKey(Question, verbose_name='Вопрос', on_delete=models.CASCADE, related_name='variants')
+    variant = models.CharField(verbose_name='Вариант', max_length=300)
 
     class Meta:
+        verbose_name = 'Вариант'
+        verbose_name_plural = 'Варианты'
         unique_together = ('variant', 'question')
         ordering = ('id',)
 

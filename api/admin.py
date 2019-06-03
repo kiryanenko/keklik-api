@@ -5,7 +5,6 @@ from api.models import User, Quiz, Question, Variant, Tag, Game, GeneratedQuesti
 
 admin.site.register(User, UserAdmin)
 
-admin.site.register(Variant)
 admin.site.register(Tag)
 
 admin.site.register(Player)
@@ -14,8 +13,9 @@ admin.site.register(Answer)
 
 class QuestionInline(admin.StackedInline):
     model = Question
-    fields = ('question', 'number', 'type', 'answer', 'timer', 'points')
+    fields = ('question', 'number', 'type', 'answer', 'timer', 'points',)
     ordering = ('number', 'id')
+    show_change_link = True
     extra = 1
 
 
@@ -35,6 +35,13 @@ class QuizAdmin(admin.ModelAdmin):
     ]
 
 
+class VariantInline(admin.TabularInline):
+    model = Variant
+    fields = ('variant',)
+    ordering = ('id',)
+    extra = 2
+
+
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
     fields = ('question', 'number', 'type', 'quiz', 'answer', 'timer', 'points')
@@ -45,12 +52,28 @@ class QuestionAdmin(admin.ModelAdmin):
     ordering = ('-quiz', 'number', 'id')
     raw_id_fields = ('quiz',)
 
+    inlines = [
+        VariantInline
+    ]
+
+
+@admin.register(Variant)
+class VariantAdmin(admin.ModelAdmin):
+    fields = ('question', 'variant',)
+    list_display = ('variant', 'question',)
+    list_filter = ('question__type', 'question__quiz__tags', 'question__quiz__version_date')
+    date_hierarchy = 'question__quiz__version_date'
+    search_fields = ('variant', 'question',)
+    ordering = ('-question__quiz', 'question__number', 'question__id', 'id')
+    raw_id_fields = ('question',)
+
 
 class GeneratedQuestionInline(admin.TabularInline):
     model = GeneratedQuestion
     fields = ('question', 'variants_order', 'started_at')
     readonly_fields = ('question', 'started_at')
     ordering = ('question__number', 'question__id')
+    show_change_link = True
     extra = 0
 
 
