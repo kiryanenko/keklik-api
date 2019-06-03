@@ -15,7 +15,7 @@ admin.site.register(Answer)
 class QuestionInline(admin.StackedInline):
     model = Question
     fields = ('question', 'number', 'type', 'answer', 'timer', 'points')
-    ordering = ('number', '-id')
+    ordering = ('number', 'id')
     extra = 1
 
 
@@ -42,8 +42,16 @@ class QuestionAdmin(admin.ModelAdmin):
     list_filter = ('type', 'quiz__tags', 'quiz__version_date')
     date_hierarchy = 'quiz__version_date'
     search_fields = ('question', 'number', 'title', 'description', 'tags')
-    ordering = ('-quiz', 'number', '-id')
+    ordering = ('-quiz', 'number', 'id')
     raw_id_fields = ('quiz',)
+
+
+class GeneratedQuestionInline(admin.TabularInline):
+    model = GeneratedQuestion
+    fields = ('question', 'variants_order', 'started_at')
+    readonly_fields = ('question', 'started_at')
+    ordering = ('question__number', 'question__id')
+    extra = 0
 
 
 @admin.register(Game)
@@ -60,6 +68,10 @@ class GameAdmin(admin.ModelAdmin):
     ordering = ('-created_at', '-id')
     raw_id_fields = ('quiz', 'user', 'group', 'current_question')
 
+    inlines = [
+        GeneratedQuestionInline
+    ]
+
     def organization(self, obj):
         if not obj.group:
             return None
@@ -75,5 +87,5 @@ class GeneratedQuestionAdmin(admin.ModelAdmin):
     list_filter = ('game__created_at',)
     date_hierarchy = 'game__created_at'
     search_fields = ('question',)
-    ordering = ('game', 'question__number', '-id',)
+    ordering = ('game', 'question__number', 'id',)
     raw_id_fields = ('question', 'game')
