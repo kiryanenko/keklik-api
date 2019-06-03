@@ -43,29 +43,38 @@ class Admin(models.Model):
 
 
 class Group(models.Model):
-    name = models.CharField(max_length=300)
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='groups')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    class Meta:
+        verbose_name = 'Группа организации'
+        verbose_name_plural = 'Группы организаций'
+
+    name = models.CharField(verbose_name='Название', max_length=300)
+    organization = models.ForeignKey(Organization, verbose_name='Организация', on_delete=models.CASCADE,
+                                     related_name='groups')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата добавления')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата изменения')
 
     def __str__(self):
         return self.name
 
 
 class GroupMember(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='member_of_groups')
-    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='members')
-    created_at = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE,
+                             related_name='member_of_groups')
+    group = models.ForeignKey(Group, verbose_name='Группа организации', on_delete=models.CASCADE,
+                              related_name='members')
+    created_at = models.DateTimeField(auto_now=True, verbose_name='Дата добавления')
 
     STUDENT_ROLE = 'student'
     TEACHER_ROLE = 'teacher'
     ROLE_CHOICES = (
-        (STUDENT_ROLE, 'Student'),
-        (TEACHER_ROLE, 'Teacher'),
+        (STUDENT_ROLE, 'Студент'),
+        (TEACHER_ROLE, 'Учитель'),
     )
-    role = models.CharField(max_length=100, choices=ROLE_CHOICES)
+    role = models.CharField(choices=ROLE_CHOICES, verbose_name='Роль', max_length=100)
 
     class Meta:
+        verbose_name = 'Член группы организации'
+        verbose_name_plural = 'Члены групп организаций'
         unique_together = ('group', 'user', 'role')
 
     @property
