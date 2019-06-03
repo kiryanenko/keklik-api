@@ -34,12 +34,21 @@ def report_path(instance, filename):
 
 
 class Game(models.Model):
-    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
-    label = models.CharField(max_length=300, blank=True)
-    online = models.BooleanField(default=True, db_index=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, related_name='games')
-    base_game = models.ForeignKey('Game', on_delete=models.CASCADE, null=True)
+    class Meta:
+        verbose_name = 'Игра'
+        verbose_name_plural = 'Игры'
+
+    quiz = models.ForeignKey(Quiz, verbose_name='Викторина',  on_delete=models.CASCADE)
+    label = models.CharField(max_length=300, verbose_name='Название', blank=True)
+    online = models.BooleanField(default=True, verbose_name='Интерактивная игра?',
+                                 help_text='При True игра проводится интерактивно '
+                                           '(игроки сидят в одном классе и отвечают на текущий вопрос), '
+                                           'иначе данная игра выставляется как домашнее задание '
+                                           '(игроки самостоятельно проходят викторину дома).',
+                                 db_index=True)
+    user = models.ForeignKey(User, verbose_name='Создатель игры', on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, verbose_name='Группа', on_delete=models.CASCADE, null=True, blank=True,
+                              related_name='games')
 
     PLAYERS_WAITING_STATE = 'players_waiting'
     ANSWERING_STATE = 'answering'
@@ -51,22 +60,24 @@ class Game(models.Model):
         (CHECK_STATE, 'Показ правильного ответа'),
         (FINISH_STATE, 'Финиш'),
     )
-    state = models.CharField(max_length=15, choices=STATE_CHOICES, db_index=True, default=PLAYERS_WAITING_STATE)
+    state = models.CharField(max_length=15, verbose_name='Состояние игры', choices=STATE_CHOICES, db_index=True,
+                             default=PLAYERS_WAITING_STATE)
 
-    current_question = models.ForeignKey('GeneratedQuestion', on_delete=models.CASCADE, null=True, related_name='+')
-    timer_on = models.BooleanField(default=True, db_index=True)
+    current_question = models.ForeignKey('GeneratedQuestion', verbose_name='Текущий вопрос', on_delete=models.CASCADE,
+                                         null=True, related_name='+')
+    timer_on = models.BooleanField(default=True, verbose_name='Включен ли таймер?', db_index=True)
 
     # TODO: Saving report
     # report = models.FileField(null=True, upload_to=report_path)
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True, db_index=True,
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Время создания')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Время изменения', db_index=True,
                                       help_text='Дата обновляется при любых обновлениях снапшота игры: '
                                                 'изменении модели, присоединение игрока, при новом ответе и т.д.')
-    state_changed_at = models.DateTimeField(auto_now_add=True,
+    state_changed_at = models.DateTimeField(auto_now_add=True, verbose_name='Время изменения состояния',
                                             help_text='Дата обновляется при изменении состояния `state` '
                                                       'и при изменении вопроса `current_question`.')
-    finished_at = models.DateTimeField(null=True, db_index=True)
+    finished_at = models.DateTimeField(null=True, verbose_name='Время завершения игры', db_index=True)
 
     objects = GameManager()
 
@@ -331,7 +342,7 @@ class Game(models.Model):
         return generated_question.question.points
 
     def __str__(self):
-        return '[{}] {} {} {}'.format(self.pk, self.state, self.label, self.quiz)
+        return '{} {}'.format(self.label, self.quiz)
 
 
 class GeneratedQuestionManager(models.Manager):
