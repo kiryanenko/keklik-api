@@ -410,7 +410,7 @@ class GeneratedQuestion(models.Model):
 
 
 class Player(models.Model):
-    user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, verbose_name='Пользователь', related_name='players', on_delete=models.CASCADE)
     game = models.ForeignKey(Game, verbose_name='Игра', on_delete=models.CASCADE, related_name='players')
     rating = models.IntegerField(verbose_name='Очки', default=0, help_text='Рейтинг за игру.')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Время присоединения')
