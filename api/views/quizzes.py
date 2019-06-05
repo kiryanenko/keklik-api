@@ -12,7 +12,10 @@ from api.utils.views import IsOwnerOrReadOnly
 
 
 class QuizViewSet(ModelViewSet):
-    queryset = Quiz.objects.filter(old_version__isnull=True)
+    queryset = Quiz.objects\
+        .filter(old_version__isnull=True)\
+        .select_related('user')\
+        .prefetch_related('tags', 'questions__variants')
     serializer_class = QuizSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
 
@@ -44,7 +47,10 @@ class UserQuizzesView(ListAPIView):
     def get_queryset(self):
         username = self.kwargs['username']
         user = get_object_or_404(User, username=username)
-        return Quiz.objects.filter(user=user, old_version__isnull=True)
+        return Quiz.objects\
+            .filter(user=user, old_version__isnull=True)\
+            .select_related('user')\
+            .prefetch_related('tags', 'questions__variants')
 
 
 class CurrentUserQuizzesView(UserQuizzesView):
@@ -53,4 +59,7 @@ class CurrentUserQuizzesView(UserQuizzesView):
 
     def get_queryset(self):
         user = self.request.user
-        return Quiz.objects.filter(user__username=user, old_version__isnull=True)
+        return Quiz.objects\
+            .filter(user__username=user, old_version__isnull=True)\
+            .select_related('user')\
+            .prefetch_related('tags', 'questions__variants')

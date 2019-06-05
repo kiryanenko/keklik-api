@@ -65,17 +65,18 @@ class Game(models.Model):
 
     current_question = models.ForeignKey('GeneratedQuestion', verbose_name='Текущий вопрос', on_delete=models.CASCADE,
                                          null=True, related_name='+')
-    timer_on = models.BooleanField(default=True, verbose_name='Включен ли таймер?', db_index=True)
+    timer_on = models.BooleanField(default=True, verbose_name='Включен ли таймер?',
+                                   help_text='При true текущий вопрос ограничен по времени.', db_index=True)
 
     # TODO: Saving report
     # report = models.FileField(null=True, upload_to=report_path)
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Время создания')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Время изменения', db_index=True,
-                                      help_text='Дата обновляется при любых обновлениях снапшота игры: '
+                                      help_text='Время обновляется при любых обновлениях снапшота игры: '
                                                 'изменении модели, присоединение игрока, при новом ответе и т.д.')
     state_changed_at = models.DateTimeField(auto_now_add=True, verbose_name='Время изменения состояния',
-                                            help_text='Дата обновляется при изменении состояния `state` '
+                                            help_text='Время обновляется при изменении состояния `state` '
                                                       'и при изменении вопроса `current_question`.')
     finished_at = models.DateTimeField(null=True, verbose_name='Время завершения игры', db_index=True)
 
@@ -412,7 +413,7 @@ class GeneratedQuestion(models.Model):
 class Player(models.Model):
     user = models.ForeignKey(User, verbose_name='Пользователь', related_name='players', on_delete=models.CASCADE)
     game = models.ForeignKey(Game, verbose_name='Игра', on_delete=models.CASCADE, related_name='players')
-    rating = models.IntegerField(verbose_name='Очки', default=0, help_text='Рейтинг за игру.')
+    rating = models.IntegerField(verbose_name='Очки', default=0, help_text='Очки за игру.')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Время присоединения')
     finished_at = models.DateTimeField(verbose_name='Время завершения игры', null=True, db_index=True)
 
