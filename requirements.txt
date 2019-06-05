@@ -15,3 +15,5 @@ flex
 swagger_spec_validator
 XlsxWriter
 incremental==17.5.0
+cryptography
+paramiko
